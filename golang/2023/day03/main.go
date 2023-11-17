@@ -14,61 +14,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	lettersToPriorities := map[rune]int {
-		'a': 1,
-		'b': 2,
-		'c': 3,
-		'd': 4,
-		'e': 5,
-		'f': 6,
-		'g': 7,
-		'h': 8,
-		'i': 9,
-		'j': 10,
-		'k': 11,
-		'l': 12,
-		'm': 13,
-		'n': 14,
-		'o': 15,
-		'p': 16,
-		'q': 17,
-		'r': 18,
-		's': 19,
-		't': 20,
-		'u': 21,
-		'v': 22,
-		'w': 23,
-		'x': 24,
-		'y': 25,
-		'z': 26,
-		'A': 27,
-		'B': 28,
-		'C': 29,
-		'D': 30,
-		'E': 31,
-		'F': 32,
-		'G': 33,
-		'H': 34,
-		'I': 35,
-		'J': 36,
-		'K': 37,
-		'L': 38,
-		'M': 39,
-		'N': 40,
-		'O': 41,
-		'P': 42,
-		'Q': 43,
-		'R': 44,
-		'S': 45,
-		'T': 46,
-		'U': 47,
-		'V': 48,
-		'W': 49,
-		'X': 50,
-		'Y': 51,
-		'Z': 52,
-	}
+	// pt1(file)
+	pt2(file)
 
+}
+
+func pt1(file *os.File) {
 	total := 0
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -76,17 +27,46 @@ func main() {
 		upTo := len(line) / 2
 		firstCompartment := line[:upTo]
 		secondCompartment := line[upTo:]
-		fmt.Println(firstCompartment)
-		fmt.Println(secondCompartment)
 
 		for i, r := range firstCompartment {
 			if (!strings.ContainsRune(firstCompartment[i+1:], r) && strings.ContainsRune(secondCompartment, r)) {
-				fmt.Println(string(r))
-				fmt.Println(lettersToPriorities[r])
-				total += lettersToPriorities[r]
+				total += runeToPriority(r)
 			}
 		}
 	}
 
 	fmt.Println(total);
+}
+
+func pt2(file *os.File) {
+	total := 0
+	var bags []string;
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		l := len(bags)
+		if ( l == 0 || l == 1) {
+			bags = append(bags, line);
+		} else {
+			for i, r := range line {
+				if (!strings.ContainsRune(line[i+1:], r) && strings.ContainsRune(bags[0], r) && strings.ContainsRune(bags[1], r)) {
+					total += runeToPriority(r)
+				}
+			}
+			bags = nil
+		}
+	}
+
+	fmt.Println(total);
+}
+
+func runeToPriority(r rune) int {
+	const LOWER_CASE_RUNE_START = 96
+	const UPPER_CASE_RUNE_START = 64
+	const UPPER_CASE_PRIORITY_BONUS = 26
+
+	if (r > LOWER_CASE_RUNE_START) {
+		return (int(r) - LOWER_CASE_RUNE_START)
+	} 
+	return (int(r) - UPPER_CASE_RUNE_START + UPPER_CASE_PRIORITY_BONUS)
 }
