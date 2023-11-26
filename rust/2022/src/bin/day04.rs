@@ -21,20 +21,16 @@ impl str::FromStr for SectionAssignmentPair {
     type Err = ParseSectionAssignmentPairError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (first_ass, second_ass) = s.split_once(",").unwrap();
-
-        let (first_start, first_end) = first_ass.split_once("-").unwrap();
-        let (second_start, second_end) = second_ass.split_once("-").unwrap();
+        let bits: Vec<i32> = s
+            .split(",")
+            .map(|l| l.split("-"))
+            .flatten()
+            .map(|a| a.parse::<i32>().unwrap())
+            .collect();
 
         Ok(Self {
-            first_assignment: [
-                first_start.parse::<i32>().unwrap(),
-                first_end.parse::<i32>().unwrap(),
-            ],
-            second_assignment: [
-                second_start.parse::<i32>().unwrap(),
-                second_end.parse::<i32>().unwrap(),
-            ],
+            first_assignment: [bits[0], bits[1]],
+            second_assignment: [bits[2], bits[3]],
         })
     }
 }
