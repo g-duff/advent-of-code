@@ -1,11 +1,28 @@
 use std::{fs, str};
 
 fn main() {
+    pt1();
+    pt2();
+}
+
+fn pt1() {
     let infile = load("./data/04.input".to_string());
 
-    infile
-        .into_iter()
-        .for_each(|line| println!("{:?}, {:?}", line.first_assignment, line.second_assignment));
+    let total_contained = infile.into_iter().fold(0, |total, ass_pair| {
+        total + (ass_pair.fully_contains() as i32)
+    });
+
+    println!("Part 1: {total_contained}");
+}
+
+fn pt2() {
+    let infile = load("./data/04.input".to_string());
+
+    let total_contained = infile.into_iter().fold(0, |total, ass_pair| {
+        total + (ass_pair.fully_contains() as i32)
+    });
+
+    println!("Part 1: {total_contained}");
 }
 
 #[derive(Debug)]
@@ -32,6 +49,15 @@ impl str::FromStr for SectionAssignmentPair {
             first_assignment: [bits[0], bits[1]],
             second_assignment: [bits[2], bits[3]],
         })
+    }
+}
+
+impl SectionAssignmentPair {
+    fn fully_contains(self) -> bool {
+        (self.first_assignment[0] >= self.second_assignment[0]
+            && self.first_assignment[1] <= self.second_assignment[1])
+            || (self.second_assignment[0] >= self.first_assignment[0]
+                && self.second_assignment[1] <= self.first_assignment[1])
     }
 }
 
