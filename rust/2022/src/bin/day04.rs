@@ -19,10 +19,10 @@ fn pt2() {
     let infile = load("./data/04.input".to_string());
 
     let total_contained = infile.into_iter().fold(0, |total, ass_pair| {
-        total + (ass_pair.fully_contains() as i32)
+        total + (ass_pair.partially_contains() as i32)
     });
 
-    println!("Part 1: {total_contained}");
+    println!("Part 2: {total_contained}");
 }
 
 #[derive(Debug)]
@@ -58,6 +58,13 @@ impl SectionAssignmentPair {
             && self.first_assignment[1] <= self.second_assignment[1])
             || (self.second_assignment[0] >= self.first_assignment[0]
                 && self.second_assignment[1] <= self.first_assignment[1])
+    }
+
+    fn partially_contains(self) -> bool {
+        (self.first_assignment[0] >= self.second_assignment[0]
+            && self.first_assignment[0] <= self.second_assignment[1])
+            || (self.second_assignment[0] >= self.first_assignment[0]
+                && self.second_assignment[0] <= self.first_assignment[1])
     }
 }
 
