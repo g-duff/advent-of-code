@@ -1,15 +1,20 @@
-use std::{fs, str};
+use std::{cmp, fs, str};
 
 fn main() {
-    let games = load_lines::<Game>("./data/02.input".to_string());
+    let games: Vec<Game> = load_lines("./data/02.input".to_string());
 
-    let answer = games
-        .into_iter()
+    let pt1_answer: u32 = games
+        .iter()
         .filter_map(|g| if g.is_pt1_allowed() { Some(g.id) } else { None })
-        .reduce(|acc, id| acc + id)
-        .unwrap();
+        .sum();
 
-    println!("{answer}");
+    let pt2_answer: u32 = games
+        .iter()
+        .map(|g| g.fewest_possible_cubes().power_of_cubes())
+        .sum();
+
+    println!("Part 1: {pt1_answer}");
+    println!("Part 2: {pt2_answer}");
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -25,6 +30,20 @@ impl Game {
             .map(|s| s.is_pt1_allowed())
             .reduce(|acc, b| acc && b)
             .unwrap()
+    }
+
+    fn fewest_possible_cubes(&self) -> Set {
+        let mut red = 0u32;
+        let mut green = 0u32;
+        let mut blue = 0u32;
+
+        self.sets.iter().for_each(|s| {
+            red = cmp::max(s.red, red);
+            green = cmp::max(s.green, green);
+            blue = cmp::max(s.blue, blue);
+        });
+
+        Set { red, green, blue }
     }
 }
 
@@ -62,6 +81,10 @@ struct Set {
 impl Set {
     fn is_pt1_allowed(&self) -> bool {
         self.red <= 12 && self.green <= 13 && self.blue <= 14
+    }
+
+    fn power_of_cubes(&self) -> u32 {
+        &self.red * &self.green * &self.blue
     }
 }
 
