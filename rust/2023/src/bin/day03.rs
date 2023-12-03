@@ -1,20 +1,11 @@
-#[rustfmt::skip]
-const INPUT: &str = 
-"467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..";
+use std::fs;
 
 const NON_SYMBOL: char = '.';
 
 fn main() {
-    solve_pt1(INPUT);
+    let input = fs::read_to_string("./data/03.input").unwrap();
+    let pt1_answer = solve_pt1(&input);
+    println!("{pt1_answer}");
 }
 
 fn solve_pt1(s: &str) -> i32 {
@@ -25,6 +16,7 @@ fn solve_pt1(s: &str) -> i32 {
             let mut result: Vec<char> = vec![NON_SYMBOL];
             result.extend_from_slice(&inner);
             result.push(NON_SYMBOL);
+            println!("{:?}", result);
             result
         })
         .collect();
@@ -70,9 +62,9 @@ fn solve_pt1(s: &str) -> i32 {
                     || is_not_blank(right)
                 {
                     is_part_number = true;
-                    println!("{current_char}, {row_index}, {col_index}");
                 }
-            } else if part_number != "" {
+            } 
+            if !right.is_digit(10) && part_number != "" {
                 println!("{part_number}, {is_part_number}");
                 if is_part_number {
                     part_numbers.push(part_number.parse().unwrap());
@@ -82,8 +74,6 @@ fn solve_pt1(s: &str) -> i32 {
             }
         }
     }
-
-    println!("{:?}", part_numbers);
 
     part_numbers.iter().sum()
 }
@@ -97,7 +87,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_solves_pt1() {
+    fn it_solves_pt1_example() {
         // Given
         let input = "467..114..
 ...*......
@@ -109,11 +99,23 @@ mod tests {
 ......755.
 ...$.*....
 .664.598..";
-        
+
         // When
         let result = solve_pt1(input);
 
         // Then
         assert_eq!(result, 4361);
+    }
+
+    #[test]
+    fn it_solves_pt1_input() {
+        // Given
+        let input = fs::read_to_string("./data/03.input").unwrap();
+
+        // When
+        let result = solve_pt1(&input);
+
+        // Then
+        assert_eq!(result, 521515);
     }
 }
