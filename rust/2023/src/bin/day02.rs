@@ -1,7 +1,7 @@
-use std::{cmp, fs, str};
+use std::{cmp, str};
 
 fn main() {
-    let games: Vec<Game> = load_lines("./data/02.input".to_string());
+    let games: Vec<Game> = aoc::load_to_vec("./data/02.input".to_string());
 
     let pt1_answer: u32 = games
         .iter()
@@ -113,13 +113,3 @@ impl str::FromStr for Set {
     }
 }
 
-fn load_lines<T>(path: String) -> Vec<T>
-where
-    T: str::FromStr,
-{
-    fs::read_to_string(path)
-        .unwrap()
-        .lines()
-        .filter_map(|l| l.parse::<T>().ok())
-        .collect()
-}

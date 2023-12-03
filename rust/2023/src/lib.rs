@@ -1,14 +1,12 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use std::{fs, str};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub fn load_to_vec<T>(path: String) -> Vec<T>
+where
+    T: str::FromStr,
+{
+    fs::read_to_string(path)
+        .unwrap()
+        .lines()
+        .filter_map(|l| l.parse::<T>().ok())
+        .collect()
 }
