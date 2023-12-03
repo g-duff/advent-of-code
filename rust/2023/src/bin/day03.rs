@@ -1,23 +1,15 @@
 use std::fs;
 
 const NON_SYMBOL: char = '.';
-
-#[rustfmt::skip]
-const INPUT: &str = "467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..";
+const GEAR: char = '*';
 
 fn main() {
     let input = fs::read_to_string("./data/03.input").unwrap();
     let pt1_answer = solve_pt1(&input);
     println!("{pt1_answer}");
+
+    let pt2_answer = solve_pt2(&input);
+    println!("{pt2_answer}");
 }
 
 fn solve_pt1(s: &str) -> i32 {
@@ -77,6 +69,81 @@ fn is_not_blank(c: &char) -> bool {
     c != &NON_SYMBOL && !c.is_digit(10)
 }
 
+fn solve_pt2(s: &str) -> i32 {
+    let grid = input_str_to_padded_grid(s);
+
+    let rows_count = grid.len();
+    let cols_count = grid[0].len();
+
+    let mut gear_ratios: Vec<i32> = vec![];
+
+    for row in 0..rows_count {
+        for col in 1..(cols_count - 1) {
+            if &grid[row][col] == &GEAR {
+                let next_row = row + 1;
+                let prev_row = row - 1;
+
+                let next_col = col + 1;
+                let prev_col = col - 1;
+
+                let mut part_numbers: Vec<i32> = vec![];
+                if grid[row][next_col].is_digit(10) {
+                    part_numbers.push(search_for_num(&grid, row, next_col));
+                }
+                if grid[row][prev_col].is_digit(10) {
+                    part_numbers.push(search_for_num(&grid, row, prev_col));
+                }
+
+                if grid[next_row][col].is_digit(10) {
+                    part_numbers.push(search_for_num(&grid, next_row, col));
+                } else {
+                    if grid[next_row][next_col].is_digit(10) {
+                        part_numbers.push(search_for_num(&grid, next_row, next_col));
+                    }
+                    if grid[next_row][prev_col].is_digit(10) {
+                        part_numbers.push(search_for_num(&grid, next_row, prev_col));
+                    }
+                }
+
+                if grid[prev_row][col].is_digit(10) {
+                    part_numbers.push(search_for_num(&grid, prev_row, col));
+                } else {
+                    if grid[prev_row][next_col].is_digit(10) {
+                        part_numbers.push(search_for_num(&grid, prev_row, next_col));
+                    }
+                    if grid[prev_row][prev_col].is_digit(10) {
+                        part_numbers.push(search_for_num(&grid, prev_row, prev_col));
+                    }
+                }
+
+                if part_numbers.len() == 2 {
+                    println!("{:?}", part_numbers);
+                    gear_ratios.push(part_numbers[0] * part_numbers[1]);
+                }
+            }
+        }
+    }
+    gear_ratios.iter().sum()
+}
+
+fn search_for_num(grid: &Vec<Vec<char>>, row: usize, col: usize) -> i32 {
+    let mut collected_digits = grid[row][col].to_string();
+    let mut i;
+
+    i = 1;
+    while grid[row][col + i].is_digit(10) {
+        collected_digits.push(grid[row][col + i]);
+        i += 1;
+    }
+
+    i = 1;
+    while grid[row][col - i].is_digit(10) {
+        collected_digits.insert_str(0, &grid[row][col - i].to_string());
+        i += 1;
+    }
+    collected_digits.parse().unwrap()
+}
+
 fn input_str_to_padded_grid(input: &str) -> Vec<Vec<char>> {
     let input: Vec<Vec<char>> = input
         .lines()
@@ -103,6 +170,18 @@ fn input_str_to_padded_grid(input: &str) -> Vec<Vec<char>> {
 mod tests {
     use super::*;
 
+    #[rustfmt::skip]
+    const INPUT: &str = "467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..";
+
     #[test]
     fn it_solves_pt1_example() {
         // Given When
@@ -122,5 +201,24 @@ mod tests {
 
         // Then
         assert_eq!(result, 521515);
+    }
+
+    #[test]
+    fn it_solves_pt2_example() {
+        // Given When
+        let result = solve_pt2(INPUT);
+
+        // Then
+        assert_eq!(result, 467835);
+    }
+
+    #[test]
+    fn it_solves_pt2_input() {
+        // Given When
+        let input = fs::read_to_string("./data/03.input").unwrap();
+        let result = solve_pt2(&input);
+
+        // Then
+        assert_eq!(result, 69527306);
     }
 }
