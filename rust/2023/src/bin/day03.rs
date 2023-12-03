@@ -2,6 +2,18 @@ use std::fs;
 
 const NON_SYMBOL: char = '.';
 
+#[rustfmt::skip]
+const INPUT: &str = "467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..";
+
 fn main() {
     let input = fs::read_to_string("./data/03.input").unwrap();
     let pt1_answer = solve_pt1(&input);
@@ -9,24 +21,7 @@ fn main() {
 }
 
 fn solve_pt1(s: &str) -> i32 {
-    let input: Vec<Vec<char>> = s
-        .lines()
-        .map(|l| {
-            let inner: Vec<char> = l.chars().collect();
-            let mut result: Vec<char> = vec![NON_SYMBOL];
-            result.extend_from_slice(&inner);
-            result.push(NON_SYMBOL);
-            println!("{:?}", result);
-            result
-        })
-        .collect();
-
-    let header: Vec<char> = input[0].iter().map(|_c| '.').collect();
-    let footer: Vec<char> = header.clone();
-
-    let mut grid = vec![header];
-    grid.extend_from_slice(&input);
-    grid.push(footer);
+    let grid = input_str_to_padded_grid(s);
 
     let rows_count = grid.len();
     let cols_count = grid[0].len();
@@ -63,7 +58,7 @@ fn solve_pt1(s: &str) -> i32 {
                 {
                     is_part_number = true;
                 }
-            } 
+            }
             if !right.is_digit(10) && part_number != "" {
                 println!("{part_number}, {is_part_number}");
                 if is_part_number {
@@ -82,26 +77,36 @@ fn is_not_blank(c: &char) -> bool {
     c != &NON_SYMBOL && !c.is_digit(10)
 }
 
+fn input_str_to_padded_grid(input: &str) -> Vec<Vec<char>> {
+    let input: Vec<Vec<char>> = input
+        .lines()
+        .map(|l| {
+            let inner: Vec<char> = l.chars().collect();
+            let mut result: Vec<char> = vec![NON_SYMBOL];
+            result.extend_from_slice(&inner);
+            result.push(NON_SYMBOL);
+            result
+        })
+        .collect();
+
+    let header: Vec<char> = input[0].iter().map(|_c| '.').collect();
+    let footer: Vec<char> = header.clone();
+
+    let mut grid = vec![header];
+    grid.extend_from_slice(&input);
+    grid.push(footer);
+
+    grid
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
     fn it_solves_pt1_example() {
-        // Given
-        let input = "467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..";
-
-        // When
-        let result = solve_pt1(input);
+        // Given When
+        let result = solve_pt1(INPUT);
 
         // Then
         assert_eq!(result, 4361);
