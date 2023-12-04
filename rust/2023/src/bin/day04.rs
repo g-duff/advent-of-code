@@ -13,29 +13,28 @@ fn main() {
 fn solve_pt1(cards: &Vec<Card>) -> i32 {
     cards
         .iter()
-        .map(|c| {
-            let wins = c.count_wins() as u32;
-            if wins > 0 {
-                2_i32.pow(wins - 1)
-            } else {
-                0
-            }
+        .map(|card| card.count_wins() as u32)
+        .map(|wins| match wins {
+            0 => 0,
+            _ => 2_i32.pow(wins - 1),
         })
         .sum()
 }
 
 fn solve_pt2(cards: &Vec<Card>) -> i32 {
-    let mut cards_repeats: Vec<i32> = vec![1; cards.len()];
+    let mut card_repeats: Vec<i32> = vec![1; cards.len()];
 
-    cards.iter().enumerate().for_each(|(i, c)| {
-        let wins = c.count_wins();
-        let card_repeats = cards_repeats[i];
-        for w in 1..(wins + 1) {
-            *cards_repeats.get_mut(i + w).unwrap() += card_repeats;
-        }
-    });
+    cards
+        .iter()
+        .map(|card| card.count_wins())
+        .enumerate()
+        .for_each(|(i, wins)| {
+            for w in 1..(wins + 1) {
+                card_repeats[i + w] += card_repeats[i];
+            }
+        });
 
-    cards_repeats.iter().sum()
+    card_repeats.iter().sum()
 }
 
 #[derive(Debug, PartialEq, Eq)]

@@ -162,54 +162,17 @@ mod tests {
     use super::*;
 
     #[rustfmt::skip]
-    const INPUT: &str = "467..114..
-...*......
-..35..633.
-......#...
-617*......
-.....+.58.
-..592.....
-......755.
-...$.*....
-.664.598..";
+    const EXAMPLE: &str = include_str!("./../../data/03.example");
 
     #[test]
     fn it_solves_pt1_example() {
-        // Given When
-        let result = solve_pt1(INPUT);
-
-        // Then
+        let result = solve_pt1(EXAMPLE);
         assert_eq!(result, 4361);
     }
 
     #[test]
-    fn it_solves_pt1_input() {
-        // Given
-        let input = fs::read_to_string("./data/03.input").unwrap();
-
-        // When
-        let result = solve_pt1(&input);
-
-        // Then
-        assert_eq!(result, 521515);
-    }
-
-    #[test]
     fn it_solves_pt2_example() {
-        // Given When
-        let result = solve_pt2(INPUT);
-
-        // Then
+        let result = solve_pt2(EXAMPLE);
         assert_eq!(result, 467835);
-    }
-
-    #[test]
-    fn it_solves_pt2_input() {
-        // Given When
-        let input = fs::read_to_string("./data/03.input").unwrap();
-        let result = solve_pt2(&input);
-
-        // Then
-        assert_eq!(result, 69527306);
     }
 }
