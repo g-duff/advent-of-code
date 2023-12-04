@@ -61,22 +61,17 @@ impl str::FromStr for Card {
 
     fn from_str(s: &str) -> Result<Card, ParseCardError> {
         let (_card_id, numbers) = s.split_once(":").unwrap();
-        let (win, you) = numbers.split_once("|").unwrap();
 
-        let winning_numbers = win
-            .trim_end()
-            .chars()
-            .collect::<Vec<char>>()
-            .chunks(3)
-            .map(|c| c.into_iter().collect::<String>().trim().parse().unwrap())
+        let mut split_numbers = numbers.split(" ");
+
+        let winning_numbers = split_numbers
+            .by_ref()
+            .take_while(|n| *n != "|")
+            .filter_map(|n| n.trim().parse().ok())
             .collect();
 
-        let numbers_you_have = you
-            .trim_end()
-            .chars()
-            .collect::<Vec<char>>()
-            .chunks(3)
-            .map(|c| c.into_iter().collect::<String>().trim().parse().unwrap())
+        let numbers_you_have = split_numbers
+            .filter_map(|n| n.trim().parse().ok())
             .collect();
 
         Ok(Card {
