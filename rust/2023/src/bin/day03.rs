@@ -15,43 +15,37 @@ fn main() {
 fn solve_pt1(s: &str) -> i32 {
     let grid = input_str_to_padded_grid(s);
 
-    let rows_count = grid.len();
-    let cols_count = grid[0].len();
-
     let mut part_numbers: Vec<i32> = vec![];
     let mut part_number = String::new();
     let mut is_part_number = false;
 
-    for row_index in 1..(rows_count - 1) {
-        for col_index in 1..(cols_count - 1) {
-            let current_char = &grid[row_index][col_index];
+    for row in 1..(grid.len() - 1) {
+        for col in 1..(grid[0].len() - 1) {
+            let current_char = &grid[row][col];
 
-            let top = &grid[row_index - 1][col_index];
-            let top_left = &grid[row_index - 1][col_index - 1];
-            let top_right = &grid[row_index - 1][col_index + 1];
+            let next_row = row + 1;
+            let prev_row = row - 1;
 
-            let bottom = &grid[row_index + 1][col_index];
-            let bottom_left = &grid[row_index + 1][col_index - 1];
-            let bottom_right = &grid[row_index + 1][col_index + 1];
+            let next_col = col + 1;
+            let prev_col = col - 1;
 
-            let left = &grid[row_index][col_index - 1];
-            let right = &grid[row_index][col_index + 1];
+            let coords = [
+                (prev_row, col),
+                (prev_row, prev_col),
+                (prev_row, next_col),
+                (next_row, col),
+                (next_row, prev_col),
+                (next_row, next_col),
+                (row, prev_col),
+                (row, next_col),
+            ];
 
             if current_char.is_digit(10) {
                 part_number.push(*current_char);
-                if is_not_blank(top)
-                    || is_not_blank(top_left)
-                    || is_not_blank(top_right)
-                    || is_not_blank(bottom)
-                    || is_not_blank(bottom_left)
-                    || is_not_blank(bottom_right)
-                    || is_not_blank(left)
-                    || is_not_blank(right)
-                {
-                    is_part_number = true;
-                }
+                is_part_number =
+                    is_part_number || coords.iter().any(|(r, c)| is_not_blank(&grid[*r][*c]));
             }
-            if !right.is_digit(10) && part_number != "" {
+            if !grid[row][next_col].is_digit(10) && part_number != "" {
                 println!("{part_number}, {is_part_number}");
                 if is_part_number {
                     part_numbers.push(part_number.parse().unwrap());
@@ -72,13 +66,10 @@ fn is_not_blank(c: &char) -> bool {
 fn solve_pt2(s: &str) -> i32 {
     let grid = input_str_to_padded_grid(s);
 
-    let rows_count = grid.len();
-    let cols_count = grid[0].len();
-
     let mut gear_ratios: Vec<i32> = vec![];
 
-    for row in 0..rows_count {
-        for col in 1..(cols_count - 1) {
+    for row in 0..grid.len() {
+        for col in 1..(grid[0].len() - 1) {
             if &grid[row][col] == &GEAR {
                 let next_row = row + 1;
                 let prev_row = row - 1;
