@@ -1,31 +1,64 @@
 use std::{fs, ops, str};
 
 fn main() {
-
     let almanac: Almanac = fs::read_to_string("./data/05.input")
         .unwrap()
         .parse()
         .unwrap();
 
-    let pt1_answer = solve_pt1(almanac);
-    println!("{pt1_answer}");
+    // let pt1_answer = solve_pt1(almanac);
+    // println!("{pt1_answer}");
+
+    let pt2_answer = solve_pt2(almanac);
+    println!("{pt2_answer}");
 }
 
 fn solve_pt1(almanac: Almanac) -> i64 {
     let seeds = almanac.seeds;
 
-    let answer: Vec<i64> = seeds.iter().map(|s| {
-        let mut a = s.clone();
-        for m in &almanac.maps {
-            for t in &m.transforms {
-                if t.source_range.contains(&a) {
-                    a = a + t.offset;
-                    break
+    let answer: Vec<i64> = seeds
+        .iter()
+        .map(|s| {
+            let mut a = s.clone();
+            for m in &almanac.maps {
+                for t in &m.transforms {
+                    if t.source_range.contains(&a) {
+                        a = a + t.offset;
+                        break;
+                    }
                 }
             }
-        }
-        a
-    }).collect();
+            a
+        })
+        .collect();
+
+    let minval = answer.iter().min().unwrap();
+    *minval
+}
+
+fn solve_pt2(almanac: Almanac) -> i64 {
+
+    let seeds: Vec<i64> = almanac
+        .seeds
+        .chunks(2)
+        .map(|s| (s[0]..s[0]+s[1]).collect::<Vec<i64>>())
+        .flatten().collect();
+
+    let answer: Vec<i64> = seeds
+        .iter()
+        .map(|s| {
+            let mut a = s.clone();
+            for m in &almanac.maps {
+                for t in &m.transforms {
+                    if t.source_range.contains(&a) {
+                        a = a + t.offset;
+                        break;
+                    }
+                }
+            }
+            a
+        })
+        .collect();
 
     let minval = answer.iter().min().unwrap();
     *minval
@@ -211,5 +244,17 @@ soil-to-fertilizer map:
 
         // Then
         assert_eq!(answer, 35)
+    }
+
+    #[test]
+    fn solves_pt2() {
+        // Given
+        let input = INPUT.parse().unwrap();
+
+        // When
+        let answer = solve_pt2(input);
+
+        // Then
+        assert_eq!(answer, 46)
     }
 }
