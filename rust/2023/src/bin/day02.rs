@@ -57,7 +57,7 @@ impl str::FromStr for Game {
         let (game_id, game_sets) = s.split_once(':').unwrap();
 
         let sets: Vec<Set> = game_sets
-            .split(";")
+            .split(';')
             .map(|set| set.parse::<Set>().unwrap())
             .collect();
 
@@ -84,7 +84,7 @@ impl Set {
     }
 
     fn power_of_cubes(&self) -> u32 {
-        &self.red * &self.green * &self.blue
+        self.red * self.green * self.blue
     }
 }
 
@@ -99,7 +99,7 @@ impl str::FromStr for Set {
         let mut green = 0u32;
         let mut red = 0u32;
 
-        s.split(",").into_iter().for_each(|color_count| {
+        s.split(',').for_each(|color_count| {
             let (count, color) = color_count.trim().split_once(' ').unwrap();
             match color.trim() {
                 "red" => red = count.parse::<u32>().unwrap(),
