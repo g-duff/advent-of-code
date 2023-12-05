@@ -40,12 +40,12 @@ fn solve_pt1(s: &str) -> i32 {
                 (row, next_col),
             ];
 
-            if current_char.is_digit(10) {
+            if current_char.is_ascii_digit() {
                 part_number.push(*current_char);
                 is_part_number =
                     is_part_number || coords.iter().any(|(r, c)| is_not_blank(&grid[*r][*c]));
             }
-            if !grid[row][next_col].is_digit(10) && part_number != "" {
+            if !grid[row][next_col].is_ascii_digit() && !part_number.is_empty() {
                 println!("{part_number}, {is_part_number}");
                 if is_part_number {
                     part_numbers.push(part_number.parse().unwrap());
@@ -60,7 +60,7 @@ fn solve_pt1(s: &str) -> i32 {
 }
 
 fn is_not_blank(c: &char) -> bool {
-    c != &NON_SYMBOL && !c.is_digit(10)
+    c != &NON_SYMBOL && !c.is_ascii_digit()
 }
 
 fn solve_pt2(s: &str) -> i32 {
@@ -70,7 +70,7 @@ fn solve_pt2(s: &str) -> i32 {
 
     for row in 0..grid.len() {
         for col in 1..(grid[0].len() - 1) {
-            if &grid[row][col] == &GEAR {
+            if grid[row][col] == GEAR {
                 let next_row = row + 1;
                 let prev_row = row - 1;
 
@@ -78,31 +78,31 @@ fn solve_pt2(s: &str) -> i32 {
                 let prev_col = col - 1;
 
                 let mut part_numbers: Vec<i32> = vec![];
-                if grid[row][next_col].is_digit(10) {
+                if grid[row][next_col].is_ascii_digit() {
                     part_numbers.push(search_for_num(&grid, row, next_col));
                 }
-                if grid[row][prev_col].is_digit(10) {
+                if grid[row][prev_col].is_ascii_digit() {
                     part_numbers.push(search_for_num(&grid, row, prev_col));
                 }
 
-                if grid[next_row][col].is_digit(10) {
+                if grid[next_row][col].is_ascii_digit() {
                     part_numbers.push(search_for_num(&grid, next_row, col));
                 } else {
-                    if grid[next_row][next_col].is_digit(10) {
+                    if grid[next_row][next_col].is_ascii_digit() {
                         part_numbers.push(search_for_num(&grid, next_row, next_col));
                     }
-                    if grid[next_row][prev_col].is_digit(10) {
+                    if grid[next_row][prev_col].is_ascii_digit() {
                         part_numbers.push(search_for_num(&grid, next_row, prev_col));
                     }
                 }
 
-                if grid[prev_row][col].is_digit(10) {
+                if grid[prev_row][col].is_ascii_digit() {
                     part_numbers.push(search_for_num(&grid, prev_row, col));
                 } else {
-                    if grid[prev_row][next_col].is_digit(10) {
+                    if grid[prev_row][next_col].is_ascii_digit() {
                         part_numbers.push(search_for_num(&grid, prev_row, next_col));
                     }
-                    if grid[prev_row][prev_col].is_digit(10) {
+                    if grid[prev_row][prev_col].is_ascii_digit() {
                         part_numbers.push(search_for_num(&grid, prev_row, prev_col));
                     }
                 }
@@ -117,18 +117,18 @@ fn solve_pt2(s: &str) -> i32 {
     gear_ratios.iter().sum()
 }
 
-fn search_for_num(grid: &Vec<Vec<char>>, row: usize, col: usize) -> i32 {
+fn search_for_num(grid: &[Vec<char>], row: usize, col: usize) -> i32 {
     let mut collected_digits = grid[row][col].to_string();
     let mut i;
 
     i = 1;
-    while grid[row][col + i].is_digit(10) {
+    while grid[row][col + i].is_ascii_digit() {
         collected_digits.push(grid[row][col + i]);
         i += 1;
     }
 
     i = 1;
-    while grid[row][col - i].is_digit(10) {
+    while grid[row][col - i].is_ascii_digit() {
         collected_digits.insert_str(0, &grid[row][col - i].to_string());
         i += 1;
     }
