@@ -5,7 +5,7 @@ fn main() {
 
     let pt1_answer: u32 = games
         .iter()
-        .filter_map(|g| if g.is_pt1_allowed() { Some(g.id) } else { None })
+        .filter_map(|g| g.is_pt1_allowed().then_some(g.id))
         .sum();
 
     let pt2_answer: u32 = games
@@ -112,4 +112,3 @@ impl str::FromStr for Set {
         Ok(Set { red, green, blue })
     }
 }
-
