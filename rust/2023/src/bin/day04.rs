@@ -10,7 +10,7 @@ fn main() {
     println!("Part 2: {pt2_answer}");
 }
 
-fn solve_pt1(cards: &Vec<Card>) -> i32 {
+fn solve_pt1(cards: &[Card]) -> i32 {
     cards
         .iter()
         .map(|card| card.count_wins() as u32)
@@ -59,9 +59,9 @@ impl str::FromStr for Card {
     type Err = ParseCardError;
 
     fn from_str(s: &str) -> Result<Card, ParseCardError> {
-        let (_card_id, numbers) = s.split_once(":").unwrap();
+        let (_card_id, numbers) = s.split_once(':').unwrap();
 
-        let mut split_numbers = numbers.split(" ");
+        let mut split_numbers = numbers.split(' ');
 
         let winning_numbers = split_numbers
             .by_ref()
