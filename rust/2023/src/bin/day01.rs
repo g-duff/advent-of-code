@@ -17,7 +17,7 @@ fn pt1() {
         let val = line.unwrap();
         let digits: Vec<char> = val
             .chars()
-            .filter_map(|c| if c.is_digit(10) { Some(c) } else { None })
+            .filter(|c| c.is_ascii_digit())
             .collect();
 
         let res = String::from_iter([digits.first().unwrap(), digits.last().unwrap()])
