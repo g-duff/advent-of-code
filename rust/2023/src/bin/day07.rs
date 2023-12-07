@@ -16,10 +16,10 @@ fn main() {
 #[derive(Clone, Debug, PartialEq, Eq)]
 struct Hand {
     cards: String,
-    bid: i64,
+    bid: i32,
 }
 
-fn solve_pt1(hands: Vec<Hand>) -> i64 {
+fn solve_pt1(hands: Vec<Hand>) -> i32 {
     let mut ranked_bids: Vec<RankedBid> = hands.into_iter().map(|h| h.into_ranked_bid()).collect();
 
     ranked_bids.sort_by(|a, b| a.rank.cmp(&b.rank));
@@ -27,11 +27,11 @@ fn solve_pt1(hands: Vec<Hand>) -> i64 {
     ranked_bids
         .iter()
         .enumerate()
-        .map(|(i, b)| (i as i64 + 1) * b.bid)
+        .map(|(i, b)| (i as i32 + 1) * b.bid)
         .sum()
 }
 
-fn solve_pt2(hands: Vec<Hand>) -> i64 {
+fn solve_pt2(hands: Vec<Hand>) -> i32 {
     let mut ranked_bids: Vec<RankedBid> =
         hands.into_iter().map(|h| h.into_ranked_bid_pt2()).collect();
 
@@ -40,34 +40,26 @@ fn solve_pt2(hands: Vec<Hand>) -> i64 {
     ranked_bids
         .iter()
         .enumerate()
-        .map(|(i, b)| (i as i64 + 1) * b.bid)
+        .map(|(i, b)| (i as i32 + 1) * b.bid)
         .sum()
 }
 
 impl Hand {
     fn into_ranked_bid(self) -> RankedBid {
-        let small_rank: i64 = self
+        let small_rank: i32 = self
             .cards
             .chars()
             .map(|c| match c {
-                '2' => 2,
-                '3' => 3,
-                '4' => 4,
-                '5' => 5,
-                '6' => 6,
-                '7' => 7,
-                '8' => 8,
-                '9' => 9,
                 'T' => 10,
                 'J' => 11,
                 'Q' => 12,
                 'K' => 13,
                 'A' => 14,
-                _ => 0,
+                _ => c.to_digit(10).unwrap() as i32,
             })
             .rev()
             .enumerate()
-            .fold(0, |acc, (i, a)| acc + (100_i64.pow(i as u32) * a));
+            .fold(0, |acc, (i, a)| acc + (15_i32.pow(i as u32) * a));
 
         let mut card_counts = collections::HashMap::new();
 
@@ -76,23 +68,23 @@ impl Hand {
             *super_account_amount += 1
         });
 
-        let mut hand_possibilities: Vec<i64> = card_counts.into_values().collect();
+        let mut hand_possibilities: Vec<i32> = card_counts.into_values().collect();
         hand_possibilities.sort();
         hand_possibilities.reverse();
 
         let mut big_score = 0;
         if hand_possibilities == vec![5] {
-            big_score = 60000000000
+            big_score = 6 * 11390625
         } else if hand_possibilities == vec![4, 1] {
-            big_score = 50000000000
+            big_score = 5 * 11390625
         } else if hand_possibilities == vec![3, 2] {
-            big_score = 40000000000
+            big_score = 4 * 11390625
         } else if hand_possibilities == vec![3, 1, 1] {
-            big_score = 30000000000
+            big_score = 3 * 11390625
         } else if hand_possibilities == vec![2, 2, 1] {
-            big_score = 20000000000
+            big_score = 2 * 11390625
         } else if hand_possibilities == vec![2, 1, 1, 1] {
-            big_score = 10000000000
+            big_score = 11390625
         }
 
         RankedBid {
@@ -102,30 +94,20 @@ impl Hand {
     }
 
     fn into_ranked_bid_pt2(self) -> RankedBid {
-        let small_rank: i64 = self
+        let small_rank: i32 = self
             .cards
             .chars()
-            .map(|c| {
-                match c {
-                    'J' => 0,
-                    '2' => 2,
-                    '3' => 3,
-                    '4' => 4,
-                    '5' => 5,
-                    '6' => 6,
-                    '7' => 7,
-                    '8' => 8,
-                    '9' => 9,
-                    'T' => 10,
-                    'Q' => 12,
-                    'K' => 13,
-                    'A' => 14,
-                    _ => 0,
-                }
+            .map(|c| match c {
+                'J' => 0,
+                'T' => 10,
+                'Q' => 12,
+                'K' => 13,
+                'A' => 14,
+                _ => c.to_digit(10).unwrap() as i32,
             })
             .rev()
             .enumerate()
-            .fold(0, |acc, (i, a)| acc + (100_i64.pow(i as u32) * a));
+            .fold(0, |acc, (i, a)| acc + (15_i32.pow(i as u32) * a));
 
         let mut card_counts = collections::HashMap::new();
         let mut j = 0;
@@ -139,7 +121,7 @@ impl Hand {
             }
         });
 
-        let mut hand_possibilities: Vec<i64> = card_counts.into_values().collect();
+        let mut hand_possibilities: Vec<i32> = card_counts.into_values().collect();
         hand_possibilities.sort();
         hand_possibilities.reverse();
 
@@ -150,19 +132,18 @@ impl Hand {
         }
 
         let mut big_score = 0;
-
         if hand_possibilities == vec![5] {
-            big_score = 60000000000
+            big_score = 6 * 11390625
         } else if hand_possibilities == vec![4, 1] {
-            big_score = 50000000000
+            big_score = 5 * 11390625
         } else if hand_possibilities == vec![3, 2] {
-            big_score = 40000000000
+            big_score = 4 * 11390625
         } else if hand_possibilities == vec![3, 1, 1] {
-            big_score = 30000000000
+            big_score = 3 * 11390625
         } else if hand_possibilities == vec![2, 2, 1] {
-            big_score = 20000000000
+            big_score = 2 * 11390625
         } else if hand_possibilities == vec![2, 1, 1, 1] {
-            big_score = 10000000000
+            big_score = 11390625
         }
 
         RankedBid {
@@ -174,8 +155,8 @@ impl Hand {
 
 #[derive(Debug, PartialEq, Eq)]
 struct RankedBid {
-    bid: i64,
-    rank: i64,
+    bid: i32,
+    rank: i32,
 }
 
 #[derive(Debug, PartialEq, Eq)]
