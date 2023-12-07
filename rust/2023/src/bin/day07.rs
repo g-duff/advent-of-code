@@ -3,23 +3,24 @@ use std::{collections, fs, str};
 fn main() {
     let input = &fs::read_to_string("./data/07.input").unwrap();
 
-    let hands: Vec<Hand> = input.lines().filter_map(|l| l.parse().ok()).collect();
+    let pt1_hands: Vec<Hand> = input.lines().filter_map(|l| l.parse().ok()).collect();
+    let pt2_hands = pt1_hands.clone();
 
-    // let pt1_answer = solve_pt1(hands);
-    // println!("{pt1_answer}");
+    let pt1_answer = solve_pt1(pt1_hands);
+    println!("{pt1_answer}");
 
-    let pt2_answer = solve_pt2(hands);
+    let pt2_answer = solve_pt2(pt2_hands);
     println!("{pt2_answer}");
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct Hand {
     cards: String,
     bid: i64,
 }
 
 fn solve_pt1(hands: Vec<Hand>) -> i64 {
-    let mut ranked_bids: Vec<RankedBid> = hands.into_iter().map(|h| h.to_ranked_bid()).collect();
+    let mut ranked_bids: Vec<RankedBid> = hands.into_iter().map(|h| h.into_ranked_bid()).collect();
 
     ranked_bids.sort_by(|a, b| a.rank.cmp(&b.rank));
 
@@ -32,7 +33,7 @@ fn solve_pt1(hands: Vec<Hand>) -> i64 {
 
 fn solve_pt2(hands: Vec<Hand>) -> i64 {
     let mut ranked_bids: Vec<RankedBid> =
-        hands.into_iter().map(|h| h.to_ranked_bid_pt2()).collect();
+        hands.into_iter().map(|h| h.into_ranked_bid_pt2()).collect();
 
     ranked_bids.sort_by(|a, b| a.rank.cmp(&b.rank));
 
@@ -44,28 +45,25 @@ fn solve_pt2(hands: Vec<Hand>) -> i64 {
 }
 
 impl Hand {
-    fn to_ranked_bid(self) -> RankedBid {
+    fn into_ranked_bid(self) -> RankedBid {
         let small_rank: i64 = self
             .cards
             .chars()
-            .map(|c| {
-                let d = match c {
-                    '2' => 2,
-                    '3' => 3,
-                    '4' => 4,
-                    '5' => 5,
-                    '6' => 6,
-                    '7' => 7,
-                    '8' => 8,
-                    '9' => 9,
-                    'T' => 10,
-                    'J' => 11,
-                    'Q' => 12,
-                    'K' => 13,
-                    'A' => 14,
-                    _ => 0,
-                };
-                d
+            .map(|c| match c {
+                '2' => 2,
+                '3' => 3,
+                '4' => 4,
+                '5' => 5,
+                '6' => 6,
+                '7' => 7,
+                '8' => 8,
+                '9' => 9,
+                'T' => 10,
+                'J' => 11,
+                'Q' => 12,
+                'K' => 13,
+                'A' => 14,
+                _ => 0,
             })
             .rev()
             .enumerate()
@@ -103,12 +101,12 @@ impl Hand {
         }
     }
 
-    fn to_ranked_bid_pt2(self) -> RankedBid {
+    fn into_ranked_bid_pt2(self) -> RankedBid {
         let small_rank: i64 = self
             .cards
             .chars()
             .map(|c| {
-                let d = match c {
+                match c {
                     'J' => 0,
                     '2' => 2,
                     '3' => 3,
@@ -123,8 +121,7 @@ impl Hand {
                     'K' => 13,
                     'A' => 14,
                     _ => 0,
-                };
-                d
+                }
             })
             .rev()
             .enumerate()
@@ -188,7 +185,7 @@ impl str::FromStr for Hand {
     type Err = ParseHandError;
 
     fn from_str(s: &str) -> Result<Hand, ParseHandError> {
-        let (cards, bid) = s.split_once(" ").unwrap();
+        let (cards, bid) = s.split_once(' ').unwrap();
 
         Ok(Hand {
             cards: cards.to_string(),
