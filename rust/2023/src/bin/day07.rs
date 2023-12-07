@@ -1,4 +1,4 @@
-use std::{collections, fs, str};
+use std::{fs, str};
 
 fn main() {
     let input = &fs::read_to_string("./data/07.input").unwrap();
@@ -19,34 +19,19 @@ struct Hand {
     bid: i32,
 }
 
-fn solve_pt1(hands: Vec<Hand>) -> i32 {
-    let mut ranked_bids: Vec<RankedBid> = hands.into_iter().map(|h| h.into_ranked_bid()).collect();
-
-    ranked_bids.sort_by(|a, b| a.rank.cmp(&b.rank));
-
-    ranked_bids
-        .iter()
-        .enumerate()
-        .map(|(i, b)| (i as i32 + 1) * b.bid)
-        .sum()
+fn solve_pt1(mut hands: Vec<Hand>) -> i32 {
+    hands.sort_unstable_by_key(|h| h.play());
+    hands.iter().zip(1..).map(|(h, i)| i * h.bid).sum()
 }
 
-fn solve_pt2(hands: Vec<Hand>) -> i32 {
-    let mut ranked_bids: Vec<RankedBid> =
-        hands.into_iter().map(|h| h.into_ranked_bid_pt2()).collect();
-
-    ranked_bids.sort_by(|a, b| a.rank.cmp(&b.rank));
-
-    ranked_bids
-        .iter()
-        .enumerate()
-        .map(|(i, b)| (i as i32 + 1) * b.bid)
-        .sum()
+fn solve_pt2(mut hands: Vec<Hand>) -> i32 {
+    hands.sort_unstable_by_key(|h| h.play_jokers());
+    hands.iter().zip(1..).map(|(h, i)| i * h.bid).sum()
 }
 
 impl Hand {
-    fn into_ranked_bid(self) -> RankedBid {
-        let small_rank: i32 = self
+    fn play(&self) -> i32 {
+        let card_values: Vec<i32> = self
             .cards
             .chars()
             .map(|c| match c {
@@ -57,44 +42,35 @@ impl Hand {
                 'A' => 14,
                 _ => c.to_digit(10).unwrap() as i32,
             })
+            .collect();
+
+        let minor_rank = card_values
+            .iter()
             .rev()
             .enumerate()
             .fold(0, |acc, (i, a)| acc + (15_i32.pow(i as u32) * a));
 
-        let mut card_counts = collections::HashMap::new();
-
-        self.cards.chars().for_each(|c| {
-            let super_account_amount = card_counts.entry(c).or_insert(0);
-            *super_account_amount += 1
+        let mut card_counts = card_values.iter().fold([0; 15], |mut acc, v| {
+            acc[*v as usize] += 1;
+            acc
         });
 
-        let mut hand_possibilities: Vec<i32> = card_counts.into_values().collect();
-        hand_possibilities.sort();
-        hand_possibilities.reverse();
+        card_counts.sort();
+        let major_rank = match &card_counts[11..15] {
+            [0, 0, 0, 5] => 6 * 11390625,
+            [0, 0, 1, 4] => 5 * 11390625,
+            [0, 0, 2, 3] => 4 * 11390625,
+            [0, 1, 1, 3] => 3 * 11390625,
+            [0, 1, 2, 2] => 2 * 11390625,
+            [1, 1, 1, 2] => 11390625,
+            _ => 0,
+        };
 
-        let mut big_score = 0;
-        if hand_possibilities == vec![5] {
-            big_score = 6 * 11390625
-        } else if hand_possibilities == vec![4, 1] {
-            big_score = 5 * 11390625
-        } else if hand_possibilities == vec![3, 2] {
-            big_score = 4 * 11390625
-        } else if hand_possibilities == vec![3, 1, 1] {
-            big_score = 3 * 11390625
-        } else if hand_possibilities == vec![2, 2, 1] {
-            big_score = 2 * 11390625
-        } else if hand_possibilities == vec![2, 1, 1, 1] {
-            big_score = 11390625
-        }
-
-        RankedBid {
-            bid: self.bid,
-            rank: big_score + small_rank,
-        }
+        major_rank + minor_rank
     }
 
-    fn into_ranked_bid_pt2(self) -> RankedBid {
-        let small_rank: i32 = self
+    fn play_jokers(&self) -> i32 {
+        let card_values: Vec<i32> = self
             .cards
             .chars()
             .map(|c| match c {
@@ -105,58 +81,37 @@ impl Hand {
                 'A' => 14,
                 _ => c.to_digit(10).unwrap() as i32,
             })
+            .collect();
+
+        let minor_rank = card_values
+            .iter()
             .rev()
             .enumerate()
             .fold(0, |acc, (i, a)| acc + (15_i32.pow(i as u32) * a));
 
-        let mut card_counts = collections::HashMap::new();
-        let mut j = 0;
-
-        self.cards.chars().for_each(|c| {
-            if c == 'J' {
-                j += 1
-            } else {
-                let super_account_amount = card_counts.entry(c).or_insert(0);
-                *super_account_amount += 1
-            }
+        let mut card_counts = card_values.iter().fold([0; 15], |mut acc, v| {
+            acc[*v as usize] += 1;
+            acc
         });
 
-        let mut hand_possibilities: Vec<i32> = card_counts.into_values().collect();
-        hand_possibilities.sort();
-        hand_possibilities.reverse();
+        let j = card_counts[0];
+        card_counts[0] = 0;
 
-        if j == 5 {
-            hand_possibilities = vec![5];
-        } else {
-            hand_possibilities[0] += j;
-        }
+        card_counts.sort();
+        card_counts[14] += j;
 
-        let mut big_score = 0;
-        if hand_possibilities == vec![5] {
-            big_score = 6 * 11390625
-        } else if hand_possibilities == vec![4, 1] {
-            big_score = 5 * 11390625
-        } else if hand_possibilities == vec![3, 2] {
-            big_score = 4 * 11390625
-        } else if hand_possibilities == vec![3, 1, 1] {
-            big_score = 3 * 11390625
-        } else if hand_possibilities == vec![2, 2, 1] {
-            big_score = 2 * 11390625
-        } else if hand_possibilities == vec![2, 1, 1, 1] {
-            big_score = 11390625
-        }
+        let major_rank = match &card_counts[11..15] {
+            [0, 0, 0, 5] => 6 * 11390625,
+            [0, 0, 1, 4] => 5 * 11390625,
+            [0, 0, 2, 3] => 4 * 11390625,
+            [0, 1, 1, 3] => 3 * 11390625,
+            [0, 1, 2, 2] => 2 * 11390625,
+            [1, 1, 1, 2] => 11390625,
+            _ => 0,
+        };
 
-        RankedBid {
-            bid: self.bid,
-            rank: big_score + small_rank,
-        }
+        major_rank + minor_rank
     }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-struct RankedBid {
-    bid: i32,
-    rank: i32,
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -190,6 +145,7 @@ QQQJA 483";
         // Given / When
         let hands: Vec<Hand> = INPUT.lines().filter_map(|h| h.parse().ok()).collect();
 
+        // Then
         assert_eq!(
             hands,
             vec![
@@ -219,21 +175,25 @@ QQQJA 483";
 
     #[test]
     fn it_solves_pt1() {
-        // G
+        // Given
         let input = INPUT.lines().map(|l| l.parse().unwrap()).collect();
 
+        // When
         let answer = solve_pt1(input);
 
+        // Then
         assert_eq!(answer, 6440)
     }
 
     #[test]
     fn it_solves_pt2() {
-        // G
+        // Given
         let input = INPUT.lines().map(|l| l.parse().unwrap()).collect();
 
+        // When
         let answer = solve_pt2(input);
 
+        // Then
         assert_eq!(answer, 5905)
     }
 }
