@@ -33,36 +33,35 @@ fn parse_line_to_numbers(l: &str) -> Vec<i32> {
 }
 
 fn extrapolate_last_item(value_history: Vec<i32>) -> i32 {
-    let mut top_row = value_history.clone();
-    let mut diffs: Vec<Vec<i32>> = vec![];
-    let mut all_zero = false;
-    while !all_zero {
-        let this_diff: Vec<i32> = top_row.windows(2).map(|n| n[1] - n[0]).collect();
-        all_zero = this_diff.iter().all(|d| *d == 0);
-        top_row = this_diff.clone();
-        diffs.push(this_diff);
+    let mut diffs = vec![value_history];
+    while diffs.last().unwrap().iter().any(|d| *d != 0) {
+        let next_row = diffs
+            .last()
+            .unwrap()
+            .windows(2)
+            // Intent: learn language features. Not necessary for solution
+            .filter_map(|w| <&[i32; 2]>::try_from(w).ok())
+            .map(|[former, later]| later - former)
+            .collect();
+        diffs.push(next_row);
     }
 
-    let first_val = value_history.last().unwrap();
-    let diff = diffs.iter().map(|d| d.last().unwrap_or(&0)).sum::<i32>();
-    first_val + diff
+    diffs.iter().map(|d| d.last().unwrap_or(&0)).sum::<i32>()
 }
 
 fn extrapolate_first_item(value_history: Vec<i32>) -> i32 {
-    let mut top_row = value_history.clone();
-    let mut diffs: Vec<Vec<i32>> = vec![];
-    let mut all_zero = false;
-    while !all_zero {
-        let this_diff: Vec<i32> = top_row.windows(2).map(|n| n[0] - n[1]).collect();
-        all_zero = this_diff.iter().all(|d| *d == 0);
-        top_row = this_diff.clone();
-        diffs.push(this_diff);
+    let mut diffs = vec![value_history];
+    while diffs.last().unwrap().iter().any(|d| *d != 0) {
+        let next_row = diffs
+            .last()
+            .unwrap()
+            .windows(2)
+            .map(|n| n[0] - n[1])
+            .collect();
+        diffs.push(next_row);
     }
 
-    let first_val = value_history.first().unwrap();
-    let diff = diffs.iter().map(|d| d.first().unwrap_or(&0)).sum::<i32>();
-
-    first_val + diff
+    diffs.iter().map(|d| d.first().unwrap_or(&0)).sum::<i32>()
 }
 
 #[cfg(test)]
