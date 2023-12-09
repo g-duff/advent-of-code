@@ -28,9 +28,9 @@ fn solve_pt2(cards: &Vec<Card>) -> i32 {
         .iter()
         .map(|card| card.count_wins())
         .enumerate()
-        .for_each(|(i, wins)| {
-            for w in 1..(wins + 1) {
-                card_repeats[i + w] += card_repeats[i];
+        .for_each(|(card_index, card_wins)| {
+            for w in 1..(card_wins + 1) {
+                card_repeats[card_index + w] += card_repeats[card_index];
             }
         });
 
@@ -61,16 +61,16 @@ impl str::FromStr for Card {
     fn from_str(s: &str) -> Result<Card, ParseCardError> {
         let (_card_id, numbers) = s.split_once(':').unwrap();
 
-        let mut split_numbers = numbers.split(' ');
+        let (raw_winning_numbers, raw_numbers_you_have) = numbers.split_once('|').unwrap();
 
-        let winning_numbers = split_numbers
-            .by_ref()
-            .take_while(|n| *n != "|")
-            .filter_map(|n| n.trim().parse().ok())
+        let winning_numbers = raw_winning_numbers
+            .split_whitespace()
+            .filter_map(|n| n.parse().ok())
             .collect();
 
-        let numbers_you_have = split_numbers
-            .filter_map(|n| n.trim().parse().ok())
+        let numbers_you_have = raw_numbers_you_have
+            .split_whitespace()
+            .filter_map(|n| n.parse().ok())
             .collect();
 
         Ok(Card {
