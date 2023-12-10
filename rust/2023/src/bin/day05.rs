@@ -6,8 +6,8 @@ fn main() {
         .parse()
         .unwrap();
 
-    // let pt1_answer = solve_pt1(almanac);
-    // println!("{pt1_answer}");
+    let pt1_answer = solve_pt1(almanac.clone());
+    println!("{pt1_answer}");
 
     let pt2_answer = solve_pt2(almanac);
     println!("{pt2_answer}");
@@ -19,11 +19,11 @@ fn solve_pt1(almanac: Almanac) -> i64 {
     let answer: Vec<i64> = seeds
         .iter()
         .map(|s| {
-            let mut a = s.clone();
+            let mut a = *s;
             for m in &almanac.maps {
                 for t in &m.transforms {
                     if t.source_range.contains(&a) {
-                        a = a + t.offset;
+                        a += t.offset;
                         break;
                     }
                 }
@@ -37,34 +37,52 @@ fn solve_pt1(almanac: Almanac) -> i64 {
 }
 
 fn solve_pt2(almanac: Almanac) -> i64 {
-
-    let seeds: Vec<i64> = almanac
+    let mut answer: Vec<ops::Range<i64>> = almanac
         .seeds
         .chunks(2)
-        .map(|s| (s[0]..s[0]+s[1]).collect::<Vec<i64>>())
-        .flatten().collect();
+        .map(|s| (s[0]..(s[0] + s[1])))
+        .collect();
 
-    let answer: Vec<i64> = seeds
-        .iter()
-        .map(|s| {
-            let mut a = s.clone();
-            for m in &almanac.maps {
+    for m in &almanac.maps {
+        answer = answer
+            .iter()
+            .fold(vec![], |mut transformed_ranges, current_range| {
+                let mut has_been_transformed = false;
                 for t in &m.transforms {
-                    if t.source_range.contains(&a) {
-                        a = a + t.offset;
+                    if t.source_range.contains(&current_range.start)
+                        && t.source_range.contains(&(current_range.end - 1))
+                    {
+                        transformed_ranges
+                            .push((current_range.start + t.offset)..(current_range.end + t.offset));
+                        has_been_transformed = true;
+                        break;
+                    } else if current_range.contains(&t.source_range.end) {
+                        transformed_ranges.push(
+                            (current_range.start + t.offset)..(t.source_range.end + t.offset),
+                        );
+                        transformed_ranges.push(t.source_range.end..current_range.end);
+                        has_been_transformed = true;
+                        break;
+                    } else if current_range.contains(&t.source_range.start) {
+                        transformed_ranges.push(current_range.start..t.source_range.start);
+                        transformed_ranges.push(
+                            (t.source_range.start + t.offset)..(current_range.end + t.offset),
+                        );
+                        has_been_transformed = true;
                         break;
                     }
                 }
-            }
-            a
-        })
-        .collect();
-
-    let minval = answer.iter().min().unwrap();
-    *minval
+                if !has_been_transformed {
+                    transformed_ranges.push(current_range.clone());
+                }
+                transformed_ranges
+            });
+    }
+    let minval = answer.iter().map(|r| r.start).min().unwrap();
+    minval
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct Almanac {
     seeds: Vec<i64>,
     maps: Vec<Map>,
@@ -94,7 +112,7 @@ impl str::FromStr for Almanac {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct Map {
     label: String,
     transforms: Vec<Transform>,
@@ -127,7 +145,7 @@ impl str::FromStr for Map {
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 struct Transform {
     source_range: ops::Range<i64>,
     offset: i64,
