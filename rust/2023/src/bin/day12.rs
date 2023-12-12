@@ -6,38 +6,34 @@ fn main() {
     println!("{}", answer_pt1);
 }
 
-fn solve_pt1(input: &str) -> i32 {
+fn solve_pt1(input: &str) -> i64 {
     let mut counter = 0;
     for line in input.lines() {
         let (pattern, nums) = line.split_once(' ').unwrap();
         let broken_springs: Vec<i32> = nums.split(',').filter_map(|n| n.parse().ok()).collect();
 
-        let unknown_location: Vec<usize> = pattern
-            .match_indices(|c| c == '?')
-            .map(|(i, _c)| i)
-            .collect();
-
-        let mut str_pattern = pattern.replace(['.', '?'], " ");
-
-        for option in 0..2_usize.pow(unknown_location.len() as u32) {
-            unknown_location
-                .iter()
-                .enumerate()
-                .for_each(|(n, l)| match (option >> n) & 1 {
-                    0 => str_pattern.replace_range(l..&(l + 1), " "),
-                    1 => str_pattern.replace_range(l..&(l + 1), "#"),
-                    _ => panic!("bad binary!"),
-                });
-            let found_broken_springs: Vec<i32> = str_pattern
-                .split_whitespace()
-                .map(|s| s.len() as i32)
-                .collect();
-            if found_broken_springs == broken_springs {
-                counter += 1;
-            }
-        }
+        counter += recurse(pattern.replace('.', " "), &broken_springs, 0);
     }
     counter
+}
+
+fn recurse(in_str: String, broken_springs: &Vec<i32>, idx: usize) -> i64 {
+    if idx == in_str.len() {
+        is_valid(&in_str, broken_springs) as i64
+    } else if in_str.chars().nth(idx).unwrap() == '?' {
+        recurse(in_str.replacen('?', "#", 1), broken_springs, idx + 1)
+            + recurse(in_str.replacen('?', " ", 1), broken_springs, idx + 1)
+    } else {
+        recurse(in_str, broken_springs, idx + 1)
+    }
+}
+
+fn is_valid(str_pattern: &str, broken_springs: &Vec<i32>) -> bool {
+    let found_broken_springs: Vec<i32> = str_pattern
+        .split_whitespace()
+        .map(|s| s.len() as i32)
+        .collect();
+    &found_broken_springs == broken_springs
 }
 
 #[cfg(test)]
