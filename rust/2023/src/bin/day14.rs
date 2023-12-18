@@ -129,7 +129,7 @@ impl Grid {
             .enumerate()
             .map(|(i, row)| {
                 let rock_count = row.iter().filter(|c| *c == &'O').count();
-                return rock_count * (i + 1);
+                rock_count * (i + 1)
             })
             .sum()
     }
