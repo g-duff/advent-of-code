@@ -1,7 +1,7 @@
 use std::{cmp, str};
 
 fn main() {
-    let games: Vec<Game> = aoc::load_to_vec("./data/02.input".to_string());
+    let games: Vec<Game> = aoc::load_to_vec("./data/02.input");
 
     let pt1_answer: u32 = games
         .iter()

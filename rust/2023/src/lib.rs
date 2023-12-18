@@ -1,6 +1,6 @@
 use std::{fs, str};
 
-pub fn load_to_vec<T>(path: String) -> Vec<T>
+pub fn load_to_vec<T>(path: &str) -> Vec<T>
 where
     T: str::FromStr,
 {

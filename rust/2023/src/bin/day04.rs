@@ -1,7 +1,7 @@
 use std::str;
 
 fn main() {
-    let cards: Vec<Card> = aoc::load_to_vec("./data/04.input".to_string());
+    let cards: Vec<Card> = aoc::load_to_vec("./data/04.input");
 
     let pt1_answer = solve_pt1(&cards);
     println!("Part 1: {pt1_answer}");
