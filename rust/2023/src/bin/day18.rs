@@ -1,7 +1,7 @@
-use std::{fs, str};
+use std::str;
 
 fn main() {
-    let input = fs::read_to_string("./data/18.input").unwrap();
+    let input = aoc::load_to_vec("./data/18.input");
 
     let ans_pt1 = solve_pt1(&input);
     println!("Part 1: {}", ans_pt1);
@@ -32,9 +32,7 @@ struct Loc {
     col: i64,
 }
 
-fn solve_pt1(input: &str) -> i64 {
-    let plan_items: Vec<PlanItem> = input.lines().filter_map(|l| l.parse().ok()).collect();
-
+fn solve_pt1(plan_items: &[PlanItem]) -> i64 {
     let mut row = 0;
     let mut col = 0;
     let mut vertices = vec![Loc { row, col }];
@@ -55,9 +53,7 @@ fn solve_pt1(input: &str) -> i64 {
     enclosed_points + outer_points
 }
 
-fn solve_pt2(input: &str) -> i64 {
-    let plan_items: Vec<PlanItem> = input.lines().filter_map(|l| l.parse().ok()).collect();
-
+fn solve_pt2(plan_items: &[PlanItem]) -> i64 {
     let mut row = 0;
     let mut col = 0;
     let mut vertices = vec![Loc { row, col }];
@@ -79,16 +75,13 @@ fn solve_pt2(input: &str) -> i64 {
 }
 
 fn shoelace(vertices: &[Loc]) -> i64 {
-    let first_term = vertices
+    let determinant = vertices
         .windows(2)
-        .map(|locs| locs[0].row * locs[1].col)
+        .map(|locs| locs[0].row * locs[1].col - locs[0].col * locs[1].row)
         .sum::<i64>();
-    let second_term = vertices
-        .windows(2)
-        .map(|locs| locs[0].col * locs[1].row)
-        .sum::<i64>();
+        
 
-    (first_term - second_term).abs() / 2
+    determinant.abs() / 2
 }
 
 fn picks_theorem(area: &i64, outer_points: &i64) -> i64 {
@@ -131,5 +124,26 @@ impl str::FromStr for PlanItem {
             hex_dir,
             hex_dist,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const EXAMPLE: &str = include_str!("./../../data/18.example");
+
+    #[test]
+    fn it_solves_pt1() {
+        let input: Vec<PlanItem> = EXAMPLE.lines().filter_map(|l| l.parse().ok()).collect();
+        let ans = solve_pt1(&input);
+        assert_eq!(ans, 62);
+    }
+
+    #[test]
+    fn it_solves_pt2() {
+        let input: Vec<PlanItem> = EXAMPLE.lines().filter_map(|l| l.parse().ok()).collect();
+        let ans = solve_pt2(&input);
+        assert_eq!(ans, 952408144115);
     }
 }
