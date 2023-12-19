@@ -1,11 +1,14 @@
 use std::collections::HashMap;
-use std::{fs, str};
+use std::{fs, ops, str};
 
 fn main() {
     let input = fs::read_to_string("./data/19.input").unwrap();
 
     let pt1_ans = solve_pt1(&input);
     println!("Part 1: {}", pt1_ans);
+
+    let pt2_ans = solve_pt2(&input);
+    println!("Part 2: {}", pt2_ans);
 }
 
 #[derive(Debug)]
@@ -14,6 +17,14 @@ struct Part {
     m: i32,
     a: i32,
     s: i32,
+}
+
+#[derive(Clone, Debug)]
+struct PartRange {
+    x: ops::Range<i64>,
+    m: ops::Range<i64>,
+    a: ops::Range<i64>,
+    s: ops::Range<i64>,
 }
 
 #[derive(Debug)]
@@ -80,6 +91,114 @@ fn solve_pt1(input: &str) -> i32 {
             tot += p.x + p.m + p.a + p.s
         }
     }
+    tot
+}
+
+fn solve_pt2(input: &str) -> i64 {
+    let (workflows_block, _) = input.split_once("\n\n").unwrap();
+
+    let _ = workflows_block.lines();
+
+    let workflows: Vec<WorkFlow> = workflows_block
+        .lines()
+        .filter_map(|w| w.parse().ok())
+        .collect();
+
+    let mut workflow_map = HashMap::new();
+
+    for w in workflows {
+        workflow_map.insert(w.key.clone(), w);
+    }
+
+    let part_range = PartRange {
+        x: 1..4001,
+        m: 1..4001,
+        a: 1..4001,
+        s: 1..4001,
+    };
+    recurse(&workflow_map, part_range, "in")
+}
+
+fn recurse(workflow_map: &HashMap<String, WorkFlow>, part_range: PartRange, key: &str) -> i64 {
+    if (part_range.x.end - part_range.x.start) <= 0
+        || (part_range.m.end - part_range.m.start) <= 0
+        || (part_range.a.end - part_range.a.start) <= 0
+        || (part_range.s.end - part_range.s.start) <= 0
+    {
+        return 0;
+    }
+
+    if key == "A" {
+        let combinations = (part_range.x.end - part_range.x.start)
+            * (part_range.m.end - part_range.m.start)
+            * (part_range.a.end - part_range.a.start)
+            * (part_range.s.end - part_range.s.start);
+        return combinations;
+    }
+
+    if key == "R" {
+        return 0;
+    }
+
+    let workflow = workflow_map.get(key).unwrap();
+
+    let mut tot = 0;
+    let mut false_range = part_range.clone();
+    for r in workflow.rules.iter() {
+        match [r.category, r.operator] {
+            ['x', '<'] => {
+                let mut true_range = false_range.clone();
+                true_range.x.end = r.val as i64;
+                false_range.x.start = r.val as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['x', '>'] => {
+                let mut true_range = false_range.clone();
+                true_range.x.start = (r.val + 1) as i64;
+                false_range.x.end = (r.val + 1) as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['m', '<'] => {
+                let mut true_range = false_range.clone();
+                true_range.m.end = r.val as i64;
+                false_range.m.start = r.val as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['m', '>'] => {
+                let mut true_range = false_range.clone();
+                false_range.m.end = (r.val + 1) as i64;
+                true_range.m.start = (r.val + 1) as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['a', '<'] => {
+                let mut true_range = false_range.clone();
+                true_range.a.end = r.val as i64;
+                false_range.a.start = r.val as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['a', '>'] => {
+                let mut true_range = false_range.clone();
+                true_range.a.start = (r.val + 1) as i64;
+                false_range.a.end = (r.val + 1) as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['s', '<'] => {
+                let mut true_range = false_range.clone();
+                true_range.s.end = r.val as i64;
+                false_range.s.start = r.val as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            ['s', '>'] => {
+                let mut true_range = false_range.clone();
+                true_range.s.start = (r.val + 1) as i64;
+                false_range.s.end = (r.val + 1) as i64;
+                tot += recurse(workflow_map, true_range, &r.result);
+            }
+            _ => unreachable!(),
+        }
+    }
+
+    tot += recurse(workflow_map, false_range, &workflow.default);
     tot
 }
 
