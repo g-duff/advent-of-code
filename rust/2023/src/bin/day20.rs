@@ -7,6 +7,9 @@ fn main() {
 
     let pt1_ans = solve_pt1(&input);
     println!("Part 1: {}", pt1_ans);
+
+    let pt2_ans = solve_pt2(&input);
+    println!("Part 2: {}", pt2_ans);
 }
 
 fn solve_pt1(input: &str) -> i32 {
@@ -45,10 +48,60 @@ fn solve_pt1(input: &str) -> i32 {
     low_count * high_count
 }
 
-#[derive(Clone, Debug)]
-enum Pulse {
-    High,
-    Low,
+fn solve_pt2(input: &str) -> i64 {
+    let mut comm_mods = construct_modules(input);
+    let mut q: VecDeque<Communication> = VecDeque::new();
+
+    let mut lowest_fh = 0;
+    let mut lowest_mf = 0;
+    let mut lowest_fz = 0;
+    let mut lowest_ss = 0;
+
+    for i in 1..100000 {
+        q.push_front(Communication {
+            from: "button".to_string(),
+            to: "broadcaster".to_string(),
+            pulse: Pulse::Low,
+        });
+
+        while let Some(c) = q.pop_back() {
+            if c.to == "fh" && lowest_fh == 0 && c.pulse == Pulse::Low {
+                lowest_fh = i;
+            }
+            if c.to == "mf" && lowest_mf == 0 && c.pulse == Pulse::Low {
+                lowest_mf = i;
+            }
+            if c.to == "fz" && lowest_fz == 0 && c.pulse == Pulse::Low {
+                lowest_fz = i;
+            }
+            if c.to == "ss" && lowest_ss == 0 && c.pulse == Pulse::Low {
+                lowest_ss = i;
+            }
+
+            if lowest_fh * lowest_mf * lowest_fz * lowest_ss != 0 {
+                break;
+            }
+
+            let m = comm_mods.get_mut(&c.to);
+
+            match m {
+                Some(mm) => {
+                    let ps = mm.pulse(c);
+                    for p in ps {
+                        q.push_front(p);
+                    }
+                }
+                None => continue,
+            }
+        }
+    }
+
+    // Worked for me. May not work for all.
+    lowest_fh * lowest_mf * lowest_fz * lowest_ss
+}
+
+trait CommunicationModule {
+    fn pulse(&mut self, comm: Communication) -> Vec<Communication>;
 }
 
 #[derive(Clone, Debug)]
@@ -58,8 +111,10 @@ struct Communication {
     to: String,
 }
 
-trait CommunicationModule {
-    fn pulse(&mut self, comm: Communication) -> Vec<Communication>;
+#[derive(Clone, Debug, Eq, PartialEq)]
+enum Pulse {
+    High,
+    Low,
 }
 
 #[derive(Clone, Debug)]
