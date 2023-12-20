@@ -1,20 +1,57 @@
-use std::collections::{HashMap, VecDeque};
 use std::boxed::Box;
+use std::collections::{HashMap, VecDeque};
 use std::fs;
 
 fn main() {
-    let input = fs::read_to_string("./data/20.example").unwrap();
+    let input = fs::read_to_string("./data/20.input").unwrap();
 
-    // let pt1_ans = solve_pt1(&input);
-    // println!("Part 1: {}", pt1_ans);
+    let pt1_ans = solve_pt1(&input);
+    println!("Part 1: {}", pt1_ans);
 }
 
-#[derive(Clone)]
+fn solve_pt1(input: &str) -> i32 {
+    let mut comm_mods = construct_modules(input);
+    let mut q: VecDeque<Communication> = VecDeque::new();
+
+    let mut low_count = 0;
+    let mut high_count = 0;
+
+    for _i in 0..1000 {
+        q.push_front(Communication {
+            from: "button".to_string(),
+            to: "broadcaster".to_string(),
+            pulse: Pulse::Low,
+        });
+
+        while let Some(c) = q.pop_back() {
+            match c.pulse {
+                Pulse::Low => low_count += 1,
+                Pulse::High => high_count += 1,
+            }
+
+            let m = comm_mods.get_mut(&c.to);
+
+            match m {
+                Some(mm) => {
+                    let ps = mm.pulse(c);
+                    for p in ps {
+                        q.push_front(p);
+                    }
+                }
+                None => continue,
+            }
+        }
+    }
+    low_count * high_count
+}
+
+#[derive(Clone, Debug)]
 enum Pulse {
     High,
     Low,
 }
 
+#[derive(Clone, Debug)]
 struct Communication {
     pulse: Pulse,
     from: String,
@@ -25,6 +62,7 @@ trait CommunicationModule {
     fn pulse(&mut self, comm: Communication) -> Vec<Communication>;
 }
 
+#[derive(Clone, Debug)]
 struct BroadcastModule {
     to: Vec<String>,
 }
@@ -109,33 +147,41 @@ impl CommunicationModule for FlipFlopModule {
     }
 }
 
-fn solve_pt1(input: &str) -> i32 {
-    // To build the conjunctions, construct them empty and put in vec, then loop over the
-    // constructed items a second time to populate the from communications block.
-    
-    let modules: Vec<Box<dyn CommunicationModule>> = input.lines().map(|l| {
+fn construct_modules(input: &str) -> HashMap<String, Box<dyn CommunicationModule>> {
+    input.lines().fold(HashMap::new(), |mut acc, l| {
         let (from, to_all) = l.split_once(" -> ").unwrap();
         let to = to_all.split(", ").map(|s| s.to_string()).collect();
         let key = from[1..].to_string();
         match from.chars().next().unwrap() {
-            '%' => Box::new(FlipFlopModule {
-                key,
-                on: false,
-                to,
-            }) as Box<dyn CommunicationModule>,
-            '&' => Box::new(ConjunctionModule {
-                key,
-                to,
-                from: vec![],
-            }) as Box<dyn CommunicationModule>,
-            'b' => Box::new(BroadcastModule {
-                to
-            }) as Box<dyn CommunicationModule>,
-            _ => unreachable!(),
-        }
-    }).collect();
+            '%' => acc.insert(
+                key.clone(),
+                Box::new(FlipFlopModule { key, on: false, to }) as Box<dyn CommunicationModule>,
+            ),
+            '&' => {
+                let from = input.lines().fold(vec![], |mut acc, l| {
+                    let (this_from, this_to) = l.split_once(" -> ").unwrap();
+                    let this_from = this_from[1..].to_string();
+                    if this_to.contains(&key) {
+                        acc.push(Communication {
+                            pulse: Pulse::Low,
+                            from: this_from,
+                            to: key.clone(),
+                        });
+                    }
+                    acc
+                });
 
-    // let q: VecDeque<Communication> = VecDeque::new();
-    // let comm_modules: HashMap<String, Box<dyn CommunicationModule>> = HashMap::new();
-    0
+                acc.insert(
+                    key.clone(),
+                    Box::new(ConjunctionModule { key, to, from }) as Box<dyn CommunicationModule>,
+                )
+            }
+            'b' => acc.insert(
+                "broadcaster".to_string(),
+                Box::new(BroadcastModule { to }) as Box<dyn CommunicationModule>,
+            ),
+            _ => unreachable!(),
+        };
+        acc
+    })
 }
