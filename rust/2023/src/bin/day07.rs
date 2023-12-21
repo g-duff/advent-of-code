@@ -1,9 +1,7 @@
-use std::{fs, str};
+use std::str;
 
 fn main() {
-    let input = &fs::read_to_string("./data/07.input").unwrap();
-
-    let pt1_hands: Vec<Hand> = input.lines().filter_map(|l| l.parse().ok()).collect();
+    let pt1_hands: Vec<Hand> = aoc::load_to_vec("./data/07.input");
     let pt2_hands = pt1_hands.clone();
 
     let pt1_answer = solve_pt1(pt1_hands);
