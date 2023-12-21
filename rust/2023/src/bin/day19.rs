@@ -16,10 +16,10 @@ fn main() {
 
 #[derive(Debug)]
 struct Part {
-    x: i32,
-    m: i32,
-    a: i32,
-    s: i32,
+    x: i64,
+    m: i64,
+    a: i64,
+    s: i64,
 }
 
 #[derive(Clone, Debug)]
@@ -62,14 +62,12 @@ impl WorkFlow {
 struct WorkRule {
     category: char,
     operator: char,
-    val: i32,
+    val: i64,
     result: String,
 }
 
-fn solve_pt1(input: &str) -> i32 {
+fn solve_pt1(input: &str) -> i64 {
     let (workflows_block, parts_block) = input.split_once("\n\n").unwrap();
-
-    let _ = workflows_block.lines();
 
     let parts: Vec<Part> = parts_block.lines().filter_map(|p| p.parse().ok()).collect();
     let workflows: Vec<WorkFlow> = workflows_block
@@ -156,50 +154,50 @@ fn bfs(workflow_map: &HashMap<String, WorkFlow>, part_range: PartRange, key: &st
             match [r.category, r.operator] {
                 ['x', '<'] => {
                     let mut true_range = false_range.clone();
-                    true_range.x.end = r.val as i64;
-                    false_range.x.start = r.val as i64;
+                    true_range.x.end = r.val;
+                    false_range.x.start = r.val;
                     q.push_front((&r.result, true_range));
                 }
                 ['x', '>'] => {
                     let mut true_range = false_range.clone();
-                    true_range.x.start = (r.val + 1) as i64;
-                    false_range.x.end = (r.val + 1) as i64;
+                    true_range.x.start = r.val + 1;
+                    false_range.x.end = r.val + 1;
                     q.push_front((&r.result, true_range));
                 }
                 ['m', '<'] => {
                     let mut true_range = false_range.clone();
-                    true_range.m.end = r.val as i64;
-                    false_range.m.start = r.val as i64;
+                    true_range.m.end = r.val;
+                    false_range.m.start = r.val;
                     q.push_front((&r.result, true_range));
                 }
                 ['m', '>'] => {
                     let mut true_range = false_range.clone();
-                    false_range.m.end = (r.val + 1) as i64;
-                    true_range.m.start = (r.val + 1) as i64;
+                    false_range.m.end = r.val + 1;
+                    true_range.m.start = r.val + 1;
                     q.push_front((&r.result, true_range));
                 }
                 ['a', '<'] => {
                     let mut true_range = false_range.clone();
-                    true_range.a.end = r.val as i64;
-                    false_range.a.start = r.val as i64;
+                    true_range.a.end = r.val;
+                    false_range.a.start = r.val;
                     q.push_front((&r.result, true_range));
                 }
                 ['a', '>'] => {
                     let mut true_range = false_range.clone();
-                    true_range.a.start = (r.val + 1) as i64;
-                    false_range.a.end = (r.val + 1) as i64;
+                    true_range.a.start = r.val + 1;
+                    false_range.a.end = r.val + 1;
                     q.push_front((&r.result, true_range));
                 }
                 ['s', '<'] => {
                     let mut true_range = false_range.clone();
-                    true_range.s.end = r.val as i64;
-                    false_range.s.start = r.val as i64;
+                    true_range.s.end = r.val;
+                    false_range.s.start = r.val;
                     q.push_front((&r.result, true_range));
                 }
                 ['s', '>'] => {
                     let mut true_range = false_range.clone();
-                    true_range.s.start = (r.val + 1) as i64;
-                    false_range.s.end = (r.val + 1) as i64;
+                    true_range.s.start = r.val + 1;
+                    false_range.s.end = r.val + 1;
                     q.push_front((&r.result, true_range));
                 }
                 _ => unreachable!(),
@@ -266,50 +264,50 @@ fn dfs(workflow_map: &HashMap<String, WorkFlow>, part_range: PartRange, key: &st
         match [r.category, r.operator] {
             ['x', '<'] => {
                 let mut true_range = false_range.clone();
-                true_range.x.end = r.val as i64;
-                false_range.x.start = r.val as i64;
+                true_range.x.end = r.val;
+                false_range.x.start = r.val;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['x', '>'] => {
                 let mut true_range = false_range.clone();
-                true_range.x.start = (r.val + 1) as i64;
-                false_range.x.end = (r.val + 1) as i64;
+                true_range.x.start = r.val + 1;
+                false_range.x.end = r.val + 1;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['m', '<'] => {
                 let mut true_range = false_range.clone();
-                true_range.m.end = r.val as i64;
-                false_range.m.start = r.val as i64;
+                true_range.m.end = r.val;
+                false_range.m.start = r.val;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['m', '>'] => {
                 let mut true_range = false_range.clone();
-                false_range.m.end = (r.val + 1) as i64;
-                true_range.m.start = (r.val + 1) as i64;
+                false_range.m.end = r.val + 1;
+                true_range.m.start = r.val + 1;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['a', '<'] => {
                 let mut true_range = false_range.clone();
-                true_range.a.end = r.val as i64;
-                false_range.a.start = r.val as i64;
+                true_range.a.end = r.val;
+                false_range.a.start = r.val;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['a', '>'] => {
                 let mut true_range = false_range.clone();
-                true_range.a.start = (r.val + 1) as i64;
-                false_range.a.end = (r.val + 1) as i64;
+                true_range.a.start = r.val + 1;
+                false_range.a.end = r.val + 1;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['s', '<'] => {
                 let mut true_range = false_range.clone();
-                true_range.s.end = r.val as i64;
-                false_range.s.start = r.val as i64;
+                true_range.s.end = r.val;
+                false_range.s.start = r.val;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             ['s', '>'] => {
                 let mut true_range = false_range.clone();
-                true_range.s.start = (r.val + 1) as i64;
-                false_range.s.end = (r.val + 1) as i64;
+                true_range.s.start = r.val + 1;
+                false_range.s.end = r.val + 1;
                 tot += dfs(workflow_map, true_range, &r.result);
             }
             _ => unreachable!(),
@@ -328,7 +326,7 @@ impl str::FromStr for Part {
     fn from_str(s: &str) -> Result<Part, ParseErr> {
         let vals = s.trim_start_matches('{').trim_end_matches('}').split(',');
 
-        let nums: Vec<i32> = vals
+        let nums: Vec<i64> = vals
             .map(|v| &v[2..])
             .filter_map(|v| v.parse().ok())
             .collect();
@@ -353,7 +351,7 @@ impl str::FromStr for WorkFlow {
             .iter()
             .map(|r| {
                 let (rest, result) = r.split_once(':').unwrap();
-                let val: i32 = rest[2..].parse().unwrap();
+                let val: i64 = rest[2..].parse().unwrap();
 
                 let cat_and_op: Vec<char> = rest[..2].chars().collect();
 
