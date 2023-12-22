@@ -1,47 +1,39 @@
-use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::fs;
 
 const NUMS: [&str; 9] = [
     "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 ];
 
 fn main() {
-    pt1();
-    pt2();
+    let input = fs::read_to_string("./data/01.input").unwrap();
+
+    let ans_pt1 = solve_pt1(&input);
+    println!("Part 1: {}", ans_pt1);
+
+    let ans_pt2 = solve_pt2(&input);
+    println!("Part 2: {}", ans_pt2);
 }
 
-fn pt1() {
-    let file = File::open("./data/01.input").unwrap();
-
-    let answer = BufReader::new(file).lines().fold(0, |acc, line| {
-        let val = line.unwrap();
-        let digits: Vec<char> = val
+fn solve_pt1(input: &str) -> i32 {
+    input.lines().fold(0, |acc, val| {
+        let digits: Vec<i32> = val
             .chars()
-            .filter(|c| c.is_ascii_digit())
+            .filter_map(|c| c.to_string().parse().ok())
             .collect();
-
-        let res = String::from_iter([digits.first().unwrap(), digits.last().unwrap()])
-            .parse::<i32>()
-            .unwrap();
-
+        let res = 10 * digits.first().unwrap() + digits.last().unwrap();
         acc + res
-    });
-
-    println!("Part 1: {answer}");
+    })
 }
 
-fn pt2() {
-    let file = File::open("./data/01.input").unwrap();
-
-    let answer = BufReader::new(file).lines().fold(0, |acc, line| {
-        let first_num_val = line.unwrap();
+fn solve_pt2(input: &str) -> i32 {
+    let answer = input.lines().fold(0, |acc, line| {
+        let first_num_val = line;
 
         let mut first_digit = 0.to_string();
         let mut last_digit = 0.to_string();
 
         for i in 0..first_num_val.len() {
             for (n, num) in NUMS.iter().enumerate() {
-
                 if first_digit == 0.to_string()
                     && (first_num_val[i..].starts_with(num)
                         || first_num_val[i..].starts_with(&(n + 1).to_string()))
@@ -51,11 +43,11 @@ fn pt2() {
 
                 if last_digit == 0.to_string()
                     && (first_num_val[..(first_num_val.len() - i)].ends_with(num)
-                        || first_num_val[..(first_num_val.len() - i)].ends_with(&(n + 1).to_string()))
+                        || first_num_val[..(first_num_val.len() - i)]
+                            .ends_with(&(n + 1).to_string()))
                 {
                     last_digit = (n + 1).to_string();
                 }
-
             }
         }
 
@@ -66,5 +58,5 @@ fn pt2() {
         acc + res
     });
 
-    println!("Part 2: {answer}");
+    answer
 }
