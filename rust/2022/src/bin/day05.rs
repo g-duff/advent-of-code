@@ -1,58 +1,74 @@
-use std::{fs, str};
+use std::fs;
 
 fn main() {
-    #[rustfmt::skip]
-    let mut crate_stacks = vec![
-        vec!['Z', 'N'],
-        vec!['M', 'C', 'D'],
-        vec!['P']
-    ];
+    let infile = fs::read_to_string("./data/05.example").unwrap();
+    let my_inf: Vec<String> = infile.split("\n\n").map(|s| s.to_string()).collect();
 
-    let infile = load::<RearrangementInstruction>("./data/05.example".to_string());
+    let stacks = &my_inf[0];
+    let parsed_stacks = parse_stacks(stacks);
 
-    infile.into_iter().for_each(|instruction| {
-        for _i in 0..instruction.quantity {
-            let stacked_item = crate_stacks[(instruction.from - 1) as usize].pop().unwrap();
-            crate_stacks[(instruction.to - 1) as usize].push(stacked_item);
+    let instructions = &my_inf[1];
+    let parsed_instructions = parse_instructions(instructions);
+
+    let pt1_ans = solve_pt1(parsed_stacks, parsed_instructions);
+    println!("Part 1: {pt1_ans}");
+}
+
+fn solve_pt1(mut stacks: Vec<Vec<char>>, instructions: Vec<Vec<usize>>) -> String {
+    for instruction in instructions {
+        let n_crates = instruction[0];
+        let from_stack = instruction[1] - 1;
+        let to_stack = instruction[2] - 1;
+
+        for _i in 0..n_crates {
+            let aoc_crate = stacks[from_stack].pop().expect("Oh no");
+            stacks[to_stack].push(aoc_crate);
         }
-    });
-
-    for v in crate_stacks {
-        println!("{:?}", v.last().unwrap());
     }
+
+    stacks.iter_mut().map(|s| s.pop().unwrap_or(' ')).collect()
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct RearrangementInstruction {
-    quantity: i32,
-    from: i32,
-    to: i32,
+fn parse_stacks(stacks: &str) -> Vec<Vec<char>> {
+    let mut stacks_grid: Vec<Vec<char>> = stacks.split('\n').map(|l| l.chars().collect()).collect();
+    stacks_grid.reverse();
+
+    let stacks_height = stacks_grid.len();
+
+    let n_stacks = (stacks_grid[0].len() + 1) / 4;
+
+    let mut to_return_stacks: Vec<Vec<char>> = Vec::with_capacity(n_stacks);
+
+    for _i in 0..n_stacks {
+        to_return_stacks.push(Vec::with_capacity(stacks_height));
+    }
+
+    for row in &stacks_grid[1..stacks_grid.len()] {
+        for c_idx in 0..(n_stacks) {
+            let this_char = row[c_idx * 4 + 1];
+            if this_char != ' ' {
+                to_return_stacks[c_idx].push(this_char);
+            }
+        }
+    }
+
+    to_return_stacks
 }
 
-#[derive(Debug, PartialEq, Eq)]
-struct ParseRearrangementInstructionError;
+fn parse_instructions(move_instructions: &str) -> Vec<Vec<usize>> {
+    let mut mid: Vec<&str> = move_instructions.split('\n').collect();
 
-impl str::FromStr for RearrangementInstruction {
-    type Err = ParseRearrangementInstructionError;
+    // Poor man's filter
+    mid = mid[0..mid.len() - 1].to_vec();
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let input_words: Vec<&str> = s.split_whitespace().collect();
-
-        Ok(RearrangementInstruction {
-            quantity: input_words[1].parse::<i32>().unwrap(),
-            from: input_words[3].parse::<i32>().unwrap(),
-            to: input_words[5].parse::<i32>().unwrap(),
+    mid.iter()
+        .map(|l| {
+            let ns: Vec<&str> = l.split(' ').collect();
+            vec![
+                ns[1].parse::<usize>().unwrap(),
+                ns[3].parse::<usize>().unwrap(),
+                ns[5].parse::<usize>().unwrap(),
+            ]
         })
-    }
-}
-
-fn load<T>(path: String) -> Vec<T>
-where
-    T: str::FromStr,
-{
-    fs::read_to_string(path)
-        .unwrap()
-        .lines()
-        .filter_map(|l| l.parse::<T>().ok())
         .collect()
 }
