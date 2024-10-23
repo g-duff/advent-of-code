@@ -10,8 +10,11 @@ fn main() {
     let instructions = &my_inf[1];
     let parsed_instructions = parse_instructions(instructions);
 
-    let pt1_ans = solve_pt1(parsed_stacks, parsed_instructions);
+    let pt1_ans = solve_pt1(parsed_stacks.clone(), parsed_instructions.clone());
     println!("Part 1: {pt1_ans}");
+
+    let pt2_ans = solve_pt2(parsed_stacks, parsed_instructions);
+    println!("{pt2_ans}");
 }
 
 fn solve_pt1(mut stacks: Vec<Vec<char>>, instructions: Vec<Vec<usize>>) -> String {
@@ -26,6 +29,27 @@ fn solve_pt1(mut stacks: Vec<Vec<char>>, instructions: Vec<Vec<usize>>) -> Strin
         }
     }
 
+    stacks.iter_mut().map(|s| s.pop().unwrap_or(' ')).collect()
+}
+
+fn solve_pt2(mut stacks: Vec<Vec<char>>, instructions: Vec<Vec<usize>>) -> String {
+
+    for instruction in instructions {
+        let n_crates = instruction[0];
+        let from_stack = instruction[1] - 1;
+        let to_stack = instruction[2] - 1;
+
+        let mut intermediate_stack = vec![];
+        for _i in 0..n_crates {
+            let aoc_crate = stacks[from_stack].pop().expect("Oh no");
+            intermediate_stack.push(aoc_crate);
+        }
+
+        intermediate_stack.reverse();
+        for aoc_crate in intermediate_stack {
+            stacks[to_stack].push(aoc_crate);
+        }
+    }
     stacks.iter_mut().map(|s| s.pop().unwrap_or(' ')).collect()
 }
 
