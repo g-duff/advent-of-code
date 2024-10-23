@@ -12,15 +12,10 @@ fn main() {
 
 fn solve(datastream_buffer: Vec<char>, n: usize) -> usize {
     let mut ans = 0;
-    for i in 0..datastream_buffer.len() {
-        let mut counts = Vec::with_capacity(n);
-        for j in i..(i + n) {
-            let count = datastream_buffer[i..(i + n)]
-                .iter()
-                .filter(|c| *c == &datastream_buffer[j])
-                .count();
-            counts.push(count);
-        }
+    for (i, w) in datastream_buffer.windows(n).enumerate() {
+        let counts: Vec<usize> = (i..(i + n))
+            .map(|j| w.iter().filter(|c| *c == &datastream_buffer[j]).count())
+            .collect();
         if counts == vec![1; n] {
             ans = i + n;
             break;
