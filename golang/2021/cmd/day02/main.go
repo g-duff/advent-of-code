@@ -16,7 +16,8 @@ func main() {
 	ansPt1 := solvePt1(input)
 	fmt.Println("Part 1: " + strconv.Itoa(ansPt1))
 
-	fmt.Println("Part 2: " + "todo")
+	ansPt2 := solvePt2(input)
+	fmt.Println("Part 2: " + strconv.Itoa(ansPt2))
 }
 
 func solvePt1(input []string) int {
@@ -35,6 +36,30 @@ func solvePt1(input []string) int {
 			v += count
 		case "up":
 			v -= count
+		}
+	}
+
+	return h * v
+}
+
+func solvePt2(input []string) int {
+	h := 0
+	v := 0
+	a := 0
+	for _, line := range input {
+		sl := strings.Split(line, " ")
+		motion := sl[0]
+		count, err := strconv.Atoi(sl[1])
+		check(err)
+
+		switch motion {
+		case "down":
+			a += count
+		case "up":
+			a -= count
+		case "forward":
+			h += count
+			v += count * a
 		}
 	}
 
