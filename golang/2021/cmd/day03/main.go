@@ -14,11 +14,10 @@ func main() {
 	input := strings.Split(strings.TrimSpace(string(file)), "\n")
 
 	pt1 := solvePt1(input)
-	fmt.Println("Part 1: " + strconv.Itoa(pt1))
+	fmt.Println("Part 1:", pt1)
 
 	pt2 := solvePt2(input)
-	fmt.Println("Part 2: ")
-	fmt.Println(pt2)
+	fmt.Println("Part 2:", pt2)
 }
 
 func solvePt1(input []string) int {
@@ -69,31 +68,25 @@ func getOxygenGeneratorRating(input []string) int64 {
 		nBitsSet := 0
 
 		for ri := 0; ri < nRows; ri++ {
-			// Count dominant rows
 			if rowIsSuitable[ri] && input[ri][ci] == byte('1') {
 				nBitsSet++
 			}
 		}
 
-		// Find dominant char
 		var dominantChar byte
-
-		nPossibleRows := countTrue(rowIsSuitable)
-		if nBitsSet*2 >= nPossibleRows {
+		if nBitsSet*2 >= countTrue(rowIsSuitable) {
 			dominantChar = byte('1')
 		} else {
 			dominantChar = byte('0')
 		}
 
-		// Remove unsuitable rows
 		for ri := 0; ri < nRows; ri++ {
 			if rowIsSuitable[ri] && input[ri][ci] != dominantChar {
 				rowIsSuitable[ri] = false
 			}
 		}
 
-		nPossibleRows = countTrue(rowIsSuitable)
-		if nPossibleRows == 1 {
+		if countTrue(rowIsSuitable) == 1 {
 			for ri, b := range rowIsSuitable {
 				if b {
 					binAns = input[ri]
@@ -103,8 +96,7 @@ func getOxygenGeneratorRating(input []string) int64 {
 		}
 	}
 
-	fmt.Println(binAns)
-    	n, err := strconv.ParseInt(binAns, 2, 64)
+	n, err := strconv.ParseInt(binAns, 2, 64)
 	check(err)
 	return n
 }
@@ -128,24 +120,20 @@ func getCO2ScrubberRating(input []string) int64 {
 			}
 		}
 
-		// Find dominant char
 		var leastCommonChar byte
-		nPossibleRows := countTrue(rowIsSuitable)
-		if nBitsSet*2 < nPossibleRows {
+		if nBitsSet*2 < countTrue(rowIsSuitable) {
 			leastCommonChar = byte('1')
 		} else {
 			leastCommonChar = byte('0')
 		}
 
-		// Remove unsuitable rows
 		for ri := 0; ri < nRows; ri++ {
 			if rowIsSuitable[ri] && input[ri][ci] != leastCommonChar {
 				rowIsSuitable[ri] = false
 			}
 		}
 
-		nPossibleRows = countTrue(rowIsSuitable)
-		if nPossibleRows == 1 {
+		if countTrue(rowIsSuitable) == 1 {
 			for ri, b := range rowIsSuitable {
 				if b {
 					binAns = input[ri]
@@ -155,9 +143,7 @@ func getCO2ScrubberRating(input []string) int64 {
 		}
 	}
 
-	fmt.Println(binAns)
-
-    	n, err := strconv.ParseInt(binAns, 2, 64)
+	n, err := strconv.ParseInt(binAns, 2, 64)
 	check(err)
 	return n
 }
