@@ -14,9 +14,11 @@ func main() {
 	input := strings.Split(strings.TrimSpace(string(file)), "\n")
 
 	pt1 := solvePt1(input)
-
 	fmt.Println("Part 1: " + strconv.Itoa(pt1))
-	fmt.Println("Part 2: " + "todo")
+
+	pt2 := solvePt2(input)
+	fmt.Println("Part 2: ")
+	fmt.Println(pt2)
 }
 
 func solvePt1(input []string) int {
@@ -37,13 +39,137 @@ func solvePt1(input []string) int {
 	epsilon := 0
 	for i, c := range counts {
 		if c*2 > R {
-			gamma += 1 << (C-i-1)
+			gamma += 1 << (C - i - 1)
 		} else {
-			epsilon += 1 << (C-i-1)
+			epsilon += 1 << (C - i - 1)
 		}
 	}
 
 	return gamma * epsilon
+}
+
+func solvePt2(input []string) int64 {
+	oxygenGeneratorRating := getOxygenGeneratorRating(input)
+	CO2GeneratorRating := getCO2ScrubberRating(input)
+	return oxygenGeneratorRating * CO2GeneratorRating
+}
+
+func getOxygenGeneratorRating(input []string) int64 {
+	nRows := len(input)
+	nCols := len(input[0])
+
+	rowIsSuitable := make([]bool, nRows)
+	for i := range rowIsSuitable {
+		rowIsSuitable[i] = true
+	}
+
+	var binAns string
+
+	for ci := 0; ci < nCols; ci++ {
+		nBitsSet := 0
+
+		for ri := 0; ri < nRows; ri++ {
+			// Count dominant rows
+			if rowIsSuitable[ri] && input[ri][ci] == byte('1') {
+				nBitsSet++
+			}
+		}
+
+		// Find dominant char
+		var dominantChar byte
+
+		nPossibleRows := countTrue(rowIsSuitable)
+		if nBitsSet*2 >= nPossibleRows {
+			dominantChar = byte('1')
+		} else {
+			dominantChar = byte('0')
+		}
+
+		// Remove unsuitable rows
+		for ri := 0; ri < nRows; ri++ {
+			if rowIsSuitable[ri] && input[ri][ci] != dominantChar {
+				rowIsSuitable[ri] = false
+			}
+		}
+
+		nPossibleRows = countTrue(rowIsSuitable)
+		if nPossibleRows == 1 {
+			for ri, b := range rowIsSuitable {
+				if b {
+					binAns = input[ri]
+				}
+			}
+			break
+		}
+	}
+
+	fmt.Println(binAns)
+    	n, err := strconv.ParseInt(binAns, 2, 64)
+	check(err)
+	return n
+}
+
+func getCO2ScrubberRating(input []string) int64 {
+	nRows := len(input)
+	nCols := len(input[0])
+
+	rowIsSuitable := make([]bool, nRows)
+	for i := range rowIsSuitable {
+		rowIsSuitable[i] = true
+	}
+
+	var binAns string
+
+	for ci := 0; ci < nCols; ci++ {
+		nBitsSet := 0
+		for ri := 0; ri < nRows; ri++ {
+			if rowIsSuitable[ri] && input[ri][ci] == byte('1') {
+				nBitsSet++
+			}
+		}
+
+		// Find dominant char
+		var leastCommonChar byte
+		nPossibleRows := countTrue(rowIsSuitable)
+		if nBitsSet*2 < nPossibleRows {
+			leastCommonChar = byte('1')
+		} else {
+			leastCommonChar = byte('0')
+		}
+
+		// Remove unsuitable rows
+		for ri := 0; ri < nRows; ri++ {
+			if rowIsSuitable[ri] && input[ri][ci] != leastCommonChar {
+				rowIsSuitable[ri] = false
+			}
+		}
+
+		nPossibleRows = countTrue(rowIsSuitable)
+		if nPossibleRows == 1 {
+			for ri, b := range rowIsSuitable {
+				if b {
+					binAns = input[ri]
+				}
+			}
+			break
+		}
+	}
+
+	fmt.Println(binAns)
+
+    	n, err := strconv.ParseInt(binAns, 2, 64)
+	check(err)
+	return n
+}
+
+func countTrue(bools []bool) int {
+	count := 0
+	for _, b := range bools {
+		if b {
+			count++
+		}
+	}
+	return count
 }
 
 func check(e error) {
