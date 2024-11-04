@@ -8,12 +8,14 @@ import (
 )
 
 func main() {
-	file, err := os.ReadFile("./data/day04.input")
+	file, err := os.ReadFile("./data/day04.example")
 	check(err)
 
 	ansPt1 := solvePt1(file)
 	fmt.Println("Part 1:", ansPt1)
-	fmt.Println("Part 2: " + "todo")
+
+	ansPt2 := solvePt2(file)
+	fmt.Println("Part 2:", ansPt2)
 }
 
 func solvePt1(input []byte) int {
@@ -42,10 +44,38 @@ func solvePt1(input []byte) int {
 	return total * finalNumCalled
 }
 
+func solvePt2(input []byte) int {
+	calledNumbers, boards := parseInput(input)
+
+	totalBoards := len(boards)
+	wonBoards := 0
+
+	ans := 0
+
+	for _, c := range calledNumbers {
+		for bIdx := range boards {
+			if boards[bIdx].IsDone {
+				continue
+			}
+
+			boards[bIdx].playNumber(c)
+			if boards[bIdx].hasWon() {
+				wonBoards += 1
+
+				if (wonBoards == totalBoards) {
+					ans = boards[bIdx].countScore() * c
+				}
+			}
+		}
+	}
+
+	return ans
+}
+
 type Board struct {
 	nums [5][5]int
 	markedPositions [5][5]bool
-	
+	IsDone bool
 }
 
 func (b *Board) playNumber(n int) {
@@ -78,6 +108,8 @@ func (b *Board) hasWon() bool {
 		rowHasWon = rowHasWon || rowsHaveWon[i]
 		colHasWon = colHasWon || colsHaveWon[i]
 	}
+
+	b.IsDone = rowHasWon || colHasWon
 	
 	return rowHasWon || colHasWon
 }
@@ -121,7 +153,7 @@ func parseInput(input []byte) ([]int, []Board) {
 			}
 		}
 		
-		grids[i] = Board{ nums, markedPositions }
+		grids[i] = Board{ nums, markedPositions, false}
 	}
 
 	return called_numbers, grids
