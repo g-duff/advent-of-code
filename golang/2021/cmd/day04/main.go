@@ -62,7 +62,7 @@ func solvePt2(input []byte) int {
 			if boards[bIdx].hasWon() {
 				wonBoards += 1
 
-				if (wonBoards == totalBoards) {
+				if wonBoards == totalBoards {
 					ans = boards[bIdx].countScore() * c
 				}
 			}
@@ -73,9 +73,9 @@ func solvePt2(input []byte) int {
 }
 
 type Board struct {
-	nums [5][5]int
+	nums            [5][5]int
 	markedPositions [5][5]bool
-	IsDone bool
+	IsDone          bool
 }
 
 func (b *Board) playNumber(n int) {
@@ -91,7 +91,7 @@ func (b *Board) playNumber(n int) {
 func (b *Board) hasWon() bool {
 	var rowsHaveWon, colsHaveWon [5]bool
 
-	for i := 0; i<5 ; i++ {
+	for i := 0; i < 5; i++ {
 		rowsHaveWon[i] = true
 		colsHaveWon[i] = true
 	}
@@ -104,20 +104,20 @@ func (b *Board) hasWon() bool {
 	}
 
 	rowHasWon, colHasWon := false, false
-	for i := 0; i<5 ; i++ {
+	for i := 0; i < 5; i++ {
 		rowHasWon = rowHasWon || rowsHaveWon[i]
 		colHasWon = colHasWon || colsHaveWon[i]
 	}
 
 	b.IsDone = rowHasWon || colHasWon
-	
+
 	return rowHasWon || colHasWon
 }
 
 func (b *Board) countScore() int {
 	total := 0
-	for rIdx:=0;rIdx<5;rIdx++ {
-		for cIdx:=0;cIdx<5;cIdx++ {
+	for rIdx := 0; rIdx < 5; rIdx++ {
+		for cIdx := 0; cIdx < 5; cIdx++ {
 			if !b.markedPositions[rIdx][cIdx] {
 				total += b.nums[rIdx][cIdx]
 			}
@@ -152,8 +152,8 @@ func parseInput(input []byte) ([]int, []Board) {
 				markedPositions[r][c] = false
 			}
 		}
-		
-		grids[i] = Board{ nums, markedPositions, false}
+
+		grids[i] = Board{nums, markedPositions, false}
 	}
 
 	return called_numbers, grids
