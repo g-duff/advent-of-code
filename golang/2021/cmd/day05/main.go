@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.ReadFile("./data/day05.input")
+	file, err := os.ReadFile("./data/day06.input")
 	check(err)
 
 	input := parseInput(file)
