@@ -57,7 +57,42 @@ func solvePt1(input []LineSegment) int {
 }
 
 func solvePt2(input []LineSegment) int {
-	return 0
+	var grid [1000][1000]int16
+
+	for _, l := range input {
+
+		dx := direction(l.x2 - l.x1)
+		dy := direction(l.y2 - l.y1)
+
+		if dy == 0 {
+			y := l.y1
+			for x := l.x1; x != l.x2+dx; x += dx {
+				grid[y][x] += 1
+			}
+		} else if dx == 0 {
+			x := l.x1
+			for y := l.y1; y != l.y2+dy; y += dy {
+				grid[y][x] += 1
+			}
+		} else {
+			x := l.x1
+			for y := l.y1; y != l.y2+dy; y += dy {
+				grid[y][x] += 1
+				x += dx
+			}
+		}
+
+	}
+
+	tot := 0
+	for _, row := range grid {
+		for _, cell := range row {
+			if cell > 1 {
+				tot++
+			}
+		}
+	}
+	return tot
 }
 
 type LineSegment struct {
