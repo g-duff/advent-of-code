@@ -23,20 +23,15 @@ func main() {
 }
 
 func solvePt1(input []int) int {
-	// Init
 	bracketLower := slices.Min(input)
 	bracketUpper := slices.Max(input)
 
-	// Start solving
 	costs := make([]int, (bracketUpper-bracketLower)+1)
-
 	for i := bracketLower; i <= bracketUpper; i++ {
 		costs[i-bracketLower] = costPt1(input, i)
 	}
 
-	ans := slices.Min(costs)
-
-	return ans
+	return slices.Min(costs)
 }
 
 func costPt1(x []int, x0 int) int {
@@ -56,7 +51,26 @@ func abs(x int) int {
 }
 
 func solvePt2(input []int) int {
-	return 0
+	bracketLower := slices.Min(input)
+	bracketUpper := slices.Max(input)
+
+	costs := make([]int, (bracketUpper-bracketLower)+1)
+	for i := bracketLower; i <= bracketUpper; i++ {
+		costs[i-bracketLower] = costPt2(input, i)
+	}
+
+	return slices.Min(costs)
+}
+
+func costPt2(x []int, x0 int) int {
+	tot := 0
+	for _, xi := range x {
+		steps := abs(x0 - xi)
+		for s := 0; s <= steps; s++ {
+			tot += s
+		}
+	}
+	return tot
 }
 
 func parseInput(file []byte) []int {
