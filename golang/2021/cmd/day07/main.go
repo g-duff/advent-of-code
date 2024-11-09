@@ -26,12 +26,15 @@ func solvePt1(input []int) int {
 	bracketLower := slices.Min(input)
 	bracketUpper := slices.Max(input)
 
-	costs := make([]int, (bracketUpper-bracketLower)+1)
+	cost := int(^uint(0) >> 1) // max int
 	for i := bracketLower; i <= bracketUpper; i++ {
-		costs[i-bracketLower] = costPt1(input, i)
+		iCost := costPt1(input, i)
+		if iCost < cost {
+			cost = iCost
+		}
 	}
 
-	return slices.Min(costs)
+	return cost
 }
 
 func costPt1(x []int, x0 int) int {
@@ -54,12 +57,15 @@ func solvePt2(input []int) int {
 	bracketLower := slices.Min(input)
 	bracketUpper := slices.Max(input)
 
-	costs := make([]int, (bracketUpper-bracketLower)+1)
+	cost := int(^uint(0) >> 1) // max int
 	for i := bracketLower; i <= bracketUpper; i++ {
-		costs[i-bracketLower] = costPt2(input, i)
+		iCost := costPt2(input, i)
+		if iCost < cost {
+			cost = iCost
+		}
 	}
 
-	return slices.Min(costs)
+	return cost
 }
 
 func costPt2(x []int, x0 int) int {
