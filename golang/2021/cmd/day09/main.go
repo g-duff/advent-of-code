@@ -22,12 +22,9 @@ func main() {
 
 func solvePt1(h HeightMap) int {
 	riskLevel := 0
-	for r := 0; r < h.rows; r++ {
-		for c := 0; c < h.cols; c++ {
-			if h.isLowPoint(r, c) {
-				riskLevel += (1 + h.getOr(r, c, 0))
-			}
-		}
+	for _, lowPoint := range h.findLowPoints() {
+		r, c := lowPoint[0], lowPoint[1]
+		riskLevel += (1 + h.getOr(r, c, 0))
 	}
 	return riskLevel
 }
@@ -40,6 +37,18 @@ type HeightMap struct {
 	grid [][]int
 	rows int
 	cols int
+}
+
+func (h *HeightMap) findLowPoints() [][2]int {
+	var rows = [][2]int{}
+	for r := 0; r < h.rows; r++ {
+		for c := 0; c < h.cols; c++ {
+			if h.isLowPoint(r, c) {
+				rows = append(rows, [2]int{r, c})
+			}
+		}
+	}
+	return rows
 }
 
 func (h *HeightMap) isLowPoint(row int, col int) bool {
