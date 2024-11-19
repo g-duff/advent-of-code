@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -30,7 +31,57 @@ func solvePt1(h HeightMap) int {
 }
 
 func solvePt2(input HeightMap) int {
-	return 0
+
+	lowPoints := input.findLowPoints()
+
+	sizes := make([]int, len(lowPoints))
+
+	for i, lowPoint := range lowPoints {
+		state := make([][]int, input.rows)
+		for i :=0; i<input.rows; i++ {
+			state[i] = make([]int, input.cols)
+		}
+
+		r, c := lowPoint[0], lowPoint[1]
+		state[r][c] = 1
+		floodFill(input, state, [2]int{r+1, c}, input.grid[r][c])
+		floodFill(input, state, [2]int{r-1, c}, input.grid[r][c])
+		floodFill(input, state, [2]int{r, c+1}, input.grid[r][c])
+		floodFill(input, state, [2]int{r, c-1}, input.grid[r][c])
+
+		tot := 0
+		for _, row := range state {
+			for _, cell := range row {
+				tot += cell
+			}
+		}
+		sizes[i] = tot
+	}
+
+	sort.Ints(sizes)
+	L := len(sizes)
+	return sizes[L-1]*sizes[L-2]*sizes[L-3]
+}
+
+func floodFill(h HeightMap, state [][]int, loc [2]int, val int) {
+	r, c := loc[0], loc[1]
+
+	if r < 0 || r >= h.rows  || c < 0 || c >= h.cols {
+		return
+	}
+
+	currentPos := h.grid[r][c]
+	isSet := state[r][c] == 1
+	if isSet || currentPos < val || currentPos == 9 {
+		return
+	}
+
+	state[r][c] = 1
+
+	floodFill(h, state, [2]int{r+1, c}, currentPos)
+	floodFill(h, state, [2]int{r-1, c}, currentPos)
+	floodFill(h, state, [2]int{r, c+1}, currentPos)
+	floodFill(h, state, [2]int{r, c-1}, currentPos)
 }
 
 type HeightMap struct {
