@@ -4,31 +4,32 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 )
 
 func main() {
-	file, err := os.ReadFile("./data/day10.example")
+	file, err := os.ReadFile("./data/day10.input")
 	check(err)
 
 	input := parseInput(file)
 
-	ansPt1 := solvePt1(input)
+	ansPt1, ansPt2 := solve(input)
 	fmt.Println("Part 1:", ansPt1)
-
-	ansPt2 := solvePt2(input)
 	fmt.Println("Part 2:", ansPt2)
 }
 
-func solvePt1(input []string) int {
+func solve(input []string) (int, int) {
 
-	ans := 0
+	pt1, pt2 := 0, 0
 
+	var closingChunkScores []int
 	for _, line := range input {
 		var stk stack
+		var breakLine bool
 		for _, c := range line {
 			var b rune
-			var breakLine = false
+			breakLine = false
 			switch c {
 			case '(':
 				stk = stk.push(')')
@@ -41,25 +42,25 @@ func solvePt1(input []string) int {
 			case ')':
 				stk, b, _ = stk.pop()
 				if b != ')' {
-					ans += 3
+					pt1 += 3
 					breakLine = true
 				}
 			case ']':
 				stk, b, _ = stk.pop()
 				if b != ']' {
-					ans += 57
+					pt1 += 57
 					breakLine = true
 				}
 			case '}':
 				stk, b, _ = stk.pop()
 				if b != '}' {
-					ans += 1197
+					pt1 += 1197
 					breakLine = true
 				}
 			case '>':
 				stk, b, _ = stk.pop()
 				if b != '>' {
-					ans += 25137
+					pt1 += 25137
 					breakLine = true
 				}
 			}
@@ -67,12 +68,31 @@ func solvePt1(input []string) int {
 				break
 			}
 		}
+		if !breakLine && len(stk) != 0 {
+			score := 0
+			for i := len(stk) - 1; i >= 0; i-- {
+				score *= 5
+				switch stk[i] {
+				case ')':
+					score += 1
+				case ']':
+					score += 2
+				case '}':
+					score += 3
+				case '>':
+					score += 4
+				}
+			}
+			closingChunkScores = append(closingChunkScores, score)
+		}
 	}
-	return ans
-}
 
-func solvePt2(input []string) int {
-	return 0
+	slices.Sort(closingChunkScores)
+
+	midIdx := len(closingChunkScores) / 2
+	pt2 = closingChunkScores[midIdx]
+
+	return pt1, pt2
 }
 
 func parseInput(file []byte) []string {
