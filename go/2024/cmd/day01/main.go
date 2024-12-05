@@ -20,6 +20,9 @@ func main() {
 
 	pt1 := solvePt1(col1, col2)
 	fmt.Println("Part 1: ", pt1)
+
+	pt2 := solvePt2(col1, col2)
+	fmt.Println("Part 2: ", pt2)
 }
 
 func solvePt1(col1 []int, col2 []int) int {
@@ -34,6 +37,28 @@ func solvePt1(col1 []int, col2 []int) int {
 		}
 	}
 	return ans
+}
+
+func solvePt2(col1 countable, col2 countable) int {
+
+	similarityScore := 0
+	for _, c := range col1 {
+		similarityScore += c * col2.count(c)
+	}
+
+	return similarityScore
+}
+
+type countable []int
+
+func (c *countable) count(x int) int {
+	tot := 0
+	for _, y := range *c {
+		if x == y {
+			tot++
+		}
+	}
+	return tot
 }
 
 func parse(input []byte) ([]int, []int) {
