@@ -27,7 +27,6 @@ func main() {
 
 func solvePt1(col1 []int, col2 []int) int {
 	ans := 0
-
 	for i := range col1 {
 		d := col2[i] - col1[i]
 		if d >= 0 {
@@ -40,12 +39,10 @@ func solvePt1(col1 []int, col2 []int) int {
 }
 
 func solvePt2(col1 countable, col2 countable) int {
-
 	similarityScore := 0
 	for _, c := range col1 {
 		similarityScore += c * col2.count(c)
 	}
-
 	return similarityScore
 }
 
