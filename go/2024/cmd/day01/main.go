@@ -26,36 +26,30 @@ func main() {
 }
 
 func solvePt1(col1 []int, col2 []int) int {
-	ans := 0
+	totalDistance := 0
 	for i := range col1 {
 		d := col2[i] - col1[i]
 		if d >= 0 {
-			ans += d
+			totalDistance += d
 		} else {
-			ans -= d
+			totalDistance -= d
 		}
 	}
-	return ans
+	return totalDistance
 }
 
-func solvePt2(col1 countable, col2 countable) int {
+func solvePt2(col1 []int, col2 []int) int {
 	similarityScore := 0
+
+	counts := make(map[int]int)
+	for _, n := range col2 {
+		counts[n]++
+	}
+
 	for _, c := range col1 {
-		similarityScore += c * col2.count(c)
+		similarityScore += c * counts[c]
 	}
 	return similarityScore
-}
-
-type countable []int
-
-func (c *countable) count(x int) int {
-	tot := 0
-	for _, y := range *c {
-		if x == y {
-			tot++
-		}
-	}
-	return tot
 }
 
 func parse(input []byte) ([]int, []int) {
