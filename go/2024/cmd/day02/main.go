@@ -31,7 +31,23 @@ func solvePt1(reports [][]int) int {
 }
 
 func solvePt2(reports [][]int) int {
-	return 0
+	safeReports := 0
+	for _, report := range reports {
+		if isSafe(report) {
+			safeReports++
+		} else {
+			other := make([]int, len(report))
+			for i := 0; i < len(report); i++ {
+				// I still don't understand slices
+				copy(other, report)
+				if isSafe(append(other[:i], other[i+1:]...)) {
+					safeReports++
+					break
+				}
+			}
+		}
+	}
+	return safeReports
 }
 
 func isSafe(report []int) bool {
