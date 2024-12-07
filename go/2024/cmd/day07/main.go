@@ -24,24 +24,14 @@ func main() {
 func solvePt1(calibrationEquations []CalibrationEquation) int {
 	totalCalibrationResult := 0
 	for _, ca := range calibrationEquations {
-		if calibrationResult(ca.testValue, ca.numbers[0], ca.numbers[1:], false) {
+		if calibrationResultPt1(ca.testValue, ca.numbers[0], ca.numbers[1:]) {
 			totalCalibrationResult += ca.testValue
 		}
 	}
 	return totalCalibrationResult
 }
 
-func solvePt2(calibrationEquations []CalibrationEquation) int {
-	totalCalibrationResult := 0
-	for _, ca := range calibrationEquations {
-		if calibrationResult(ca.testValue, ca.numbers[0], ca.numbers[1:], true) {
-			totalCalibrationResult += ca.testValue
-		}
-	}
-	return totalCalibrationResult
-}
-
-func calibrationResult(testValue int, runningTotal int, numbers []int, pt2 bool) bool {
+func calibrationResultPt1(testValue int, runningTotal int, numbers []int) bool {
 
 	if len(numbers) == 0 {
 		if testValue == runningTotal {
@@ -51,19 +41,40 @@ func calibrationResult(testValue int, runningTotal int, numbers []int, pt2 bool)
 		}
 	}
 
-	addResult := calibrationResult(testValue, runningTotal+numbers[0], numbers[1:], pt2)
-	mulResult := calibrationResult(testValue, runningTotal*numbers[0], numbers[1:], pt2)
-	res := addResult || mulResult
+	addResult := calibrationResultPt1(testValue, runningTotal+numbers[0], numbers[1:])
+	mulResult := calibrationResultPt1(testValue, runningTotal*numbers[0], numbers[1:])
+	return addResult || mulResult
+}
 
-	if pt2 {
-		myStr := strconv.Itoa(runningTotal) + strconv.Itoa(numbers[0])
-		myNum, err := strconv.Atoi(myStr)
-		check(err)
+func solvePt2(calibrationEquations []CalibrationEquation) int {
+	totalCalibrationResult := 0
+	for _, ca := range calibrationEquations {
+		if calibrationResultPt2(ca.testValue, ca.numbers[0], ca.numbers[1:]) {
+			totalCalibrationResult += ca.testValue
+		}
+	}
+	return totalCalibrationResult
+}
 
-		res = res || calibrationResult(testValue, myNum, numbers[1:], pt2)
+func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
+
+	if len(numbers) == 0 {
+		if testValue == runningTotal {
+			return true
+		} else {
+			return false
+		}
 	}
 
-	return res
+	myStr := strconv.Itoa(runningTotal) + strconv.Itoa(numbers[0])
+	myNum, err := strconv.Atoi(myStr)
+	check(err)
+	catResult := calibrationResultPt2(testValue, myNum, numbers[1:])
+
+	addResult := calibrationResultPt2(testValue, runningTotal+numbers[0], numbers[1:])
+	mulResult := calibrationResultPt2(testValue, runningTotal*numbers[0], numbers[1:])
+
+	return addResult || mulResult || catResult
 }
 
 type CalibrationEquation struct {
