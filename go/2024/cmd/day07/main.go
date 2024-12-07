@@ -58,15 +58,18 @@ func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
 		return testValue == runningTotal 
 	}
 
-	myStr := strconv.Itoa(runningTotal) + strconv.Itoa(numbers[0])
-	myNum, err := strconv.Atoi(myStr)
-	check(err)
-	catResult := calibrationResultPt2(testValue, myNum, numbers[1:])
-
 	addResult := calibrationResultPt2(testValue, runningTotal+numbers[0], numbers[1:])
+	catResult := calibrationResultPt2(testValue, cat(runningTotal, numbers[0]), numbers[1:])
 	mulResult := calibrationResultPt2(testValue, runningTotal*numbers[0], numbers[1:])
 
-	return addResult || mulResult || catResult
+	return addResult || catResult || mulResult
+}
+
+func cat(x int, y int ) int {
+	myStr := strconv.Itoa(x) + strconv.Itoa(y)
+	myNum, err := strconv.Atoi(myStr)
+	check(err)
+	return myNum
 }
 
 func check(e error) {
