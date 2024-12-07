@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	file, err := os.ReadFile("./data/day07.example")
+	file, err := os.ReadFile("./data/day07.input")
 	check(err)
 
 	calibrationEquations := parse(file)
@@ -24,14 +24,24 @@ func main() {
 func solvePt1(calibrationEquations []CalibrationEquation) int {
 	totalCalibrationResult := 0
 	for _, ca := range calibrationEquations {
-		if calibrationResult(ca.testValue, ca.numbers[0], ca.numbers[1:]) {
+		if calibrationResult(ca.testValue, ca.numbers[0], ca.numbers[1:], false) {
 			totalCalibrationResult += ca.testValue
 		}
 	}
 	return totalCalibrationResult
 }
 
-func calibrationResult(testValue int, runningTotal int, numbers []int) bool {
+func solvePt2(calibrationEquations []CalibrationEquation) int {
+	totalCalibrationResult := 0
+	for _, ca := range calibrationEquations {
+		if calibrationResult(ca.testValue, ca.numbers[0], ca.numbers[1:], true) {
+			totalCalibrationResult += ca.testValue
+		}
+	}
+	return totalCalibrationResult
+}
+
+func calibrationResult(testValue int, runningTotal int, numbers []int, pt2 bool) bool {
 
 	if len(numbers) == 0 {
 		if testValue == runningTotal {
@@ -41,13 +51,19 @@ func calibrationResult(testValue int, runningTotal int, numbers []int) bool {
 		}
 	}
 
-	addResult := calibrationResult(testValue, runningTotal+numbers[0], numbers[1:])
-	mulResult := calibrationResult(testValue, runningTotal*numbers[0], numbers[1:])
-	return addResult || mulResult
-}
+	addResult := calibrationResult(testValue, runningTotal+numbers[0], numbers[1:], pt2)
+	mulResult := calibrationResult(testValue, runningTotal*numbers[0], numbers[1:], pt2)
+	res := addResult || mulResult
 
-func solvePt2(calibrationEquations []CalibrationEquation) int {
-	return 0
+	if pt2 {
+		myStr := strconv.Itoa(runningTotal) + strconv.Itoa(numbers[0])
+		myNum, err := strconv.Atoi(myStr)
+		check(err)
+
+		res = res || calibrationResult(testValue, myNum, numbers[1:], pt2)
+	}
+
+	return res
 }
 
 type CalibrationEquation struct {
