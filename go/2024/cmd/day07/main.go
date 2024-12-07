@@ -58,6 +58,11 @@ func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
 		return testValue == runningTotal 
 	}
 
+	// Bailing early this way saves approx 50% time
+	if runningTotal > testValue {
+		return false
+	}
+
 	addResult := calibrationResultPt2(testValue, runningTotal+numbers[0], numbers[1:])
 	catResult := calibrationResultPt2(testValue, cat(runningTotal, numbers[0]), numbers[1:])
 	mulResult := calibrationResultPt2(testValue, runningTotal*numbers[0], numbers[1:])
