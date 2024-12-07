@@ -34,11 +34,7 @@ func solvePt1(calibrationEquations [][]int) int {
 func calibrationResultPt1(testValue int, runningTotal int, numbers []int) bool {
 
 	if len(numbers) == 0 {
-		if testValue == runningTotal {
-			return true
-		} else {
-			return false
-		}
+		return testValue == runningTotal 
 	}
 
 	addResult := calibrationResultPt1(testValue, runningTotal+numbers[0], numbers[1:])
@@ -59,11 +55,7 @@ func solvePt2(calibrationEquations [][]int) int {
 func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
 
 	if len(numbers) == 0 {
-		if testValue == runningTotal {
-			return true
-		} else {
-			return false
-		}
+		return testValue == runningTotal 
 	}
 
 	myStr := strconv.Itoa(runningTotal) + strconv.Itoa(numbers[0])
