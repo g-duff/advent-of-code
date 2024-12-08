@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
+
+	"github.com/g-duff/advent-of-code/go/2024/lib"
 )
 
 func main() {
 	file, err := os.ReadFile("./data/day06.input")
 	check(err)
 
-	guardMap := parse(file)
+	guardMap := lib.ParseToRuneGrid(file)
 
 	pt1 := solvePt1(guardMap)
 	fmt.Println("Part 1: ", pt1)
@@ -181,18 +182,6 @@ func (u *uniquePositions) add(r int, c int) {
 		}
 	}
 	*u = append(*u, [2]int{r, c})
-}
-
-func parse(input []byte) [][]rune {
-	data := strings.TrimSpace(string(input))
-	lines := strings.Split(data, "\n")
-
-	grid := make([][]rune, len(lines))
-	for i, line := range lines {
-		grid[i] = []rune(line)
-	}
-
-	return grid
 }
 
 func check(e error) {
