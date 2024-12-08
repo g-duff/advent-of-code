@@ -24,6 +24,18 @@ func ParseToIntGrid(input []byte) [][]int {
 	return grid
 }
 
+func ParseToRuneGrid(input []byte) [][]rune {
+	data := strings.TrimSpace(string(input))
+	lines := strings.Split(data, "\n")
+
+	grid := make([][]rune, len(lines))
+	for i, line := range lines {
+		grid[i] = []rune(line)
+	}
+
+	return grid
+}
+
 func check(e error) {
 	if e != nil {
 		panic(e)
