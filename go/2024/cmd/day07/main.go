@@ -34,7 +34,7 @@ func solvePt1(calibrationEquations [][]int) int {
 func calibrationResultPt1(testValue int, runningTotal int, numbers []int) bool {
 
 	if len(numbers) == 0 {
-		return testValue == runningTotal 
+		return testValue == runningTotal
 	}
 
 	addResult := calibrationResultPt1(testValue, runningTotal+numbers[0], numbers[1:])
@@ -55,7 +55,7 @@ func solvePt2(calibrationEquations [][]int) int {
 func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
 
 	if len(numbers) == 0 {
-		return testValue == runningTotal 
+		return testValue == runningTotal
 	}
 
 	// Bailing early this way saves approx 50% time
@@ -70,7 +70,7 @@ func calibrationResultPt2(testValue int, runningTotal int, numbers []int) bool {
 	return addResult || catResult || mulResult
 }
 
-func cat(x int, y int ) int {
+func cat(x int, y int) int {
 	myStr := strconv.Itoa(x) + strconv.Itoa(y)
 	myNum, err := strconv.Atoi(myStr)
 	check(err)
