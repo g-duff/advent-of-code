@@ -45,13 +45,13 @@ func solvePt1(guardMap [][]rune) int {
 	R, C := len(guardMap), len(guardMap[0])
 
 	pc := uniquePositions{}
-	pc.add(position{r, c})
+	pc.add(r, c)
 	for newR >= 0 && newR < R && newC >= 0 && newC < C {
 		if guardMap[newR][newC] != '#' {
 			r, c = newR, newC
 			newR += dirs[dirIdx][0]
 			newC += dirs[dirIdx][1]
-			pc.add(position{r, c})
+			pc.add(r, c)
 		} else {
 			dirIdx = (dirIdx + 1) % 4
 			newR = r + dirs[dirIdx][0]
@@ -88,13 +88,13 @@ func solvePt2(guardMap [][]rune) int {
 	R, C := len(guardMap), len(guardMap[0])
 
 	pc := uniquePositions{}
-	pc.add(position{r, c})
+	pc.add(r, c)
 	for newR >= 0 && newR < R && newC >= 0 && newC < C {
 		if guardMap[newR][newC] != '#' {
 			r, c = newR, newC
 			newR += dirs[dirIdx][0]
 			newC += dirs[dirIdx][1]
-			pc.add(position{r, c})
+			pc.add(r, c)
 		} else {
 			dirIdx = (dirIdx + 1) % 4
 			newR = r + dirs[dirIdx][0]
@@ -102,13 +102,12 @@ func solvePt2(guardMap [][]rune) int {
 		}
 	}
 
-
 	infiniteStates := 0
 
 	for _, p := range pc[1:] {
-		guardMap[p.r][p.c] = '#'
+		guardMap[p[0]][p[1]] = '#'
 		infiniteStates += isInfinite(guardMap)
-		guardMap[p.r][p.c] = '.'
+		guardMap[p[0]][p[1]] = '.'
 	}
 
 	return infiniteStates
@@ -173,20 +172,15 @@ func statesContains(states [][4]int, state [4]int) bool {
 	return false
 }
 
-type position struct {
-	r int
-	c int
-}
+type uniquePositions [][2]int
 
-type uniquePositions []position
-
-func (u *uniquePositions) add(pos position) {
+func (u *uniquePositions) add(r int, c int) {
 	for _, upos := range *u {
-		if upos.r == pos.r && upos.c == pos.c {
+		if upos[0] == r && upos[1] == c {
 			return
 		}
 	}
-	*u = append(*u, pos)
+	*u = append(*u, [2]int{r, c})
 }
 
 func parse(input []byte) [][]rune {
