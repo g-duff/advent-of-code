@@ -13,7 +13,7 @@ func ParseToIntGrid(input []byte) [][]int {
 	grid := make([][]int, len(lines))
 
 	for i, line := range lines {
-		fields := strings.FieldsFunc(line, func(r rune) bool { return !unicode.IsNumber(r) })
+		fields := strings.FieldsFunc(line, func(r rune) bool { return (!unicode.IsNumber(r) && r != '-' ) })
 		grid[i] = make([]int, len(fields))
 		for j, cell := range fields {
 			n, err := strconv.Atoi(cell)
