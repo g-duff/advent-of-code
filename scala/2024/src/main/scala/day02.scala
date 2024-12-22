@@ -6,9 +6,7 @@ val VALID_SIZES = Array(1, 2, 3)
   val infile = io.Source.fromFile("./data/day02.input").mkString
   var reports = parse(infile)
 
-  val isValidReports = reports.filter(isValid).size
-
-  val pt1 = isValidReports
+  val pt1 = reports.count(isValid)
   println(s"Part 1: $pt1")
 
   val pt2 = 0
@@ -18,10 +16,7 @@ def parse(input: String): Array[Array[Int]] =
   input.split("\n").map(_.split(" ").map(_.toInt))
 
 def isValid(report: Array[Int]): Boolean =
-  val diffs = report
-    .sliding(2)
-    .map(w => w(1) - w(0))
-    .toArray
+  val diffs = report.sliding(2).map(w => w(1) - w(0)).toArray
 
   val allCorrectSize =
     diffs.map(VALID_SIZES contains Math.abs(_)).fold(true)(_ && _)
