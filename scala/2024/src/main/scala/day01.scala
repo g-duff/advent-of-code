@@ -12,7 +12,8 @@ import scala.io
   val pt1 = (col0 zip col1).map((c0, c1) => Math.abs(c1 - c0)).sum()
   println(s"Part 1: $pt1")
 
-  val counts = col0.groupBy(identity).mapValues(v => v.size)
+  // Assume we'll use evaluated counts more than once
+  val counts = col0.groupMap(identity)(identity).mapValues(v => v.size)
   val pt2 = col1.map(n => n * counts.getOrElse(n, 0)).sum()
   println(s"Part 2: $pt2")
 
