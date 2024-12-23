@@ -8,8 +8,7 @@ import scala.util.matching.Regex
   val mulPtn = """mul\((\d+),(\d+)\)""".r
   val pt1 = mulPtn
     .findAllIn(infile)
-    .matchData
-    .map(m => m.group(1).toInt * m.group(2).toInt)
+    .map { case mulPtn(a, b) => a.toInt * b.toInt }
     .sum
   println(s"Part 1: $pt1")
 
