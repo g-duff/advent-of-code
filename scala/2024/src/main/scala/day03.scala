@@ -14,22 +14,12 @@ import scala.util.matching.Regex
   println(s"Part 1: $pt1")
 
   val allPtn = """mul\((\d+),(\d+)\)|don't\(\)|do\(\)""".r
-  val matches = allPtn.findAllIn(infile)
-  var isActive = true
-  var pt2 = 0
-  for p <- matches.matchData do
-    p.toString match {
-      case "do()"    => isActive = true
-      case "don't()" => isActive = false
-      case _ =>
-        if isActive then
-          val m = mulPtn.findFirstMatchIn(p.toString)
-          m match {
-            case Some(m) => pt2 = pt2 + m.group(1).toInt * m.group(2).toInt
-            case _       =>
-          }
-    }
+  val pt2 = allPtn
+    .findAllIn(infile)
+    .foldLeft(0, true) {
+      case ((tot, _), "do()")          => (tot, true)
+      case ((tot, _), "don't()")       => (tot, false)
+      case ((tot, true), mulPtn(a, b)) => (tot + a.toInt * b.toInt, true)
+      case (acc, _)                    => acc
+    }(0)
   println(s"Part 2: $pt2")
-
-def parse(input: String): Array[Array[Int]] =
-  input.split("\n").map(_.split(" ").map(_.toInt))
