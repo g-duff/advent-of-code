@@ -1,7 +1,5 @@
 package day04
 
-import scala.util.matching.Regex
-
 @main def solve(): Unit =
   val infile = parse(io.Source.fromFile("./data/day04.input").mkString)
 
@@ -22,6 +20,14 @@ import scala.util.matching.Regex
     (3, 3, List((0, 3, 'S'), (1, 2, 'A'), (2, 1, 'M'), (3, 0, 'X')))
   ).map(findPattern.tupled).sum
   println(s"Part1: $pt1")
+
+  val pt2 = List(
+    (2, 2, List((1, 1, 'A'), (0, 0, 'M'), (0, 2, 'M'), (2, 2, 'S'), (2, 0, 'S'))),
+    (2, 2, List((1, 1, 'A'), (0, 0, 'S'), (0, 2, 'M'), (2, 2, 'M'), (2, 0, 'S'))),
+    (2, 2, List((1, 1, 'A'), (0, 0, 'S'), (0, 2, 'S'), (2, 2, 'M'), (2, 0, 'M'))),
+    (2, 2, List((1, 1, 'A'), (0, 0, 'M'), (0, 2, 'S'), (2, 2, 'S'), (2, 0, 'M')))
+  ).map(findPattern.tupled).sum
+  println(s"Part2: $pt2")
 
 def parse(input: String): Array[Array[Char]] =
   input.split("\n").map(_.toCharArray())
