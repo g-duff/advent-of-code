@@ -3,36 +3,24 @@ import { readFile } from 'node:fs/promises';
 const infile = await readFile('data/day01.input', { encoding: 'utf-8' });
 const rows = infile.trim().split('\n');
 
-// Horrible
-var state = 50;
+const { pt1, pt2 } = rows.reduce(
+  ({ pos, pt1, pt2 }, row) => {
+    const [dir, _] = row;
+    const count = parseInt(row.slice(1));
 
-var pt1 = 0;
-var pt2 = 0;
-rows.forEach((row) => {
-  const [dir, ...countStr] = row;
-  const count = parseInt(countStr.join(''));
+    const twist = dir == 'R' ? (p: number) => p + 1 : (p: number) => p - 1;
 
-  if (dir == 'R')
     for (var n = 0; n < count; n++) {
-      state += 1;
-      if (state % 100 == 0) pt2++;
-    }
-  else
-    for (var n = 0; n < count; n++) {
-      state -= 1;
-      if (state % 100 == 0) pt2++;
+      pos = twist(pos);
+      if (pos % 100 == 0) pt2++;
     }
 
-  if (state < 0) {
-    state = (state % 100) + 100;
-  }
-  if (state > 99) {
-    state = state % 100;
-  }
+    if (pos % 100 == 0) pt1++;
 
-  if (state == 0) pt1++;
-  return state;
-});
+    return { pos, pt1, pt2 };
+  },
+  { pos: 50, pt1: 0, pt2: 0 }
+);
 
 console.log(`Part 1: ${pt1}`);
 console.log(`Part 2: ${pt2}`);
