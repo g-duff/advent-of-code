@@ -1,7 +1,9 @@
 {
   "name": "advent-of-code",
   "version": "0.0.0",
-  "scripts": {},
+  "scripts": {
+    "fmt": "prettier --write ."
+  },
   "license": "UNLICENSED",
   "type": "module",
   "module": "esnext",
@@ -13,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "prettier": "3.7.3",
     "tsc": "^2.0.4",
     "typescript": "^5.9.3"
   }
