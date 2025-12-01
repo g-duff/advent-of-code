@@ -9,20 +9,21 @@ const rows = infile.trim().split('\n');
 var state = 50;
 
 var pt1 = 0;
-const digits = rows.map((row) => {
+var pt2 = 0;
+rows.forEach((row) => {
 	const [dir, ...countStr] = row;
 	const count = parseInt(countStr.join(''));
 
-	switch (dir) {
-		case "L":
-			state -= count;
-			break;
-		case "R":
-			state += count;
-			break;
-		default:	
-			throw new Error("Neither L nor R");
-	}
+	if (dir == "R")
+		for (var n=0; n<count;n++){
+			state += 1;
+			if (state % 100 == 0) pt2++;
+		}
+	else 	
+		for (var n=0; n<count;n++){
+			state -= 1;
+			if (state % 100 == 0) pt2++;
+		}
 
 	if (state < 0) {
 		state = (state%100) + 100;
@@ -35,6 +36,5 @@ const digits = rows.map((row) => {
 	return state;
 });
 
-console.table(digits);
-
 console.log(`Part 1: ${pt1}`);
+console.log(`Part 2: ${pt2}`);
