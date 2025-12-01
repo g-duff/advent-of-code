@@ -1,0 +1,19 @@
+{
+  "name": "advent-of-code",
+  "version": "0.0.0",
+  "scripts": {},
+  "license": "UNLICENSED",
+  "type": "module",
+  "module": "esnext",
+  "imports": {
+    "#src/*": "./src/*"
+  },
+  "engines": {
+    "node": ">=25.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsc": "^2.0.4",
+    "typescript": "^5.9.3"
+  }
+}
