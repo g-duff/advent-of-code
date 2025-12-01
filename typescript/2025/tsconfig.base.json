@@ -30,6 +30,6 @@
     "noImplicitAny": true,
     "types": ["jest", "node"],
     "composite": true,
-    "resolveJsonModule": true,
+    "resolveJsonModule": true
   }
 }
