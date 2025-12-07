@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { defined } from '#src/index.ts';
+import { isDefined } from '#src/index.ts';
 
 const infile = await readFile('data/day07.input', { encoding: 'utf-8' });
 
@@ -19,7 +19,7 @@ const beamIdxs = new Set([startingRow.findIndex((cell) => cell == 'S')]);
 for (const row of rows) {
   const validSplitters = row
     .map((elem, idx) => (elem == '^' && beamIdxs.has(idx) ? idx : undefined))
-    .filter(defined);
+    .filter(isDefined);
 
   pt1 += validSplitters.length;
   validSplitters.forEach((s) => beamIdxs.delete(s));
@@ -41,7 +41,7 @@ beamCols[startIndex] = 1;
 for (const row of rows) {
   const validSplitters = row
     .map((elem, idx) => (elem == '^' && beamCols[idx] > 0 ? idx : undefined))
-    .filter(defined);
+    .filter(isDefined);
 
   for (const s of validSplitters) {
     const n = beamCols[s];

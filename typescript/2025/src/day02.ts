@@ -39,10 +39,7 @@ const pt2 = rows.reduce((pt2RunningTotal, row) => {
       if (n % j == 0) {
         const substrs = str.match(new RegExp(`.{1,${j}}`, 'g'))!;
         const [first, ...rest] = substrs;
-        const isInvalid = rest.reduce(
-          (acc, elem) => acc && first == elem,
-          true
-        );
+        const isInvalid = rest.every((elem) => elem == first);
         if (isInvalid) invalidIdsInRow.add(parseInt(str));
       }
     }

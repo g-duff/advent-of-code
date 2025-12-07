@@ -14,7 +14,7 @@ const ids = idsRaw.split('\n').map((x) => parseInt(x));
 
 const pt1 = ids
   .map((id) => ranges.map(([l, h]) => l <= id && id <= h))
-  .map((inRanges) => inRanges.reduce((acc, b) => acc || b, false))
+  .map((inRanges) => inRanges.some((x) => x))
   .filter((inAnyRange) => inAnyRange).length;
 
 console.log(pt1);
